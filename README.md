@@ -12,9 +12,7 @@ The **Mass Search Card** is an advanced search card for Home Assistant, designed
 
 ## Screenshots
 
-![image](https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9)
-![image](https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db)
-
+<div style="display: flex; flex-direction: row; gap: 10px;"> <img src="https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db" alt="Screenshot 1" width="45%" /> <img src="https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9" alt="Screenshot 2" width="45%" /> </div>
 
 ## Installation
 
