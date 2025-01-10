@@ -1,6 +1,7 @@
 # Mass Search Card
 
 The **Mass Search Card** is an advanced search card for Home Assistant, designed to simplify interaction with Music Assistant. This card allows you to effortlessly search for artists, tracks, albums, playlists, and radio stations and play them on your selected media players.
+Click on the magnifying glass in the input bar to search for your item, after you select a media_player en media type.
 
 ## Features
 
@@ -12,7 +13,7 @@ The **Mass Search Card** is an advanced search card for Home Assistant, designed
 
 ## Screenshots
 
-<div style="display: flex; flex-direction: row; gap: 10px;"> <img src="https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db" alt="Screenshot 1" width="45%" /> <img src="https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9" alt="Screenshot 2" width="45%" /> </div>
+<div style="display: flex; align-items: flex-start; gap: 20px;"> <img src="https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9" alt="Search Panel" width="50%"> <img src="https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db" alt="Search Results" width="50%"> </div>
 
 ## Installation
 
