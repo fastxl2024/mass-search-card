@@ -38,13 +38,12 @@ Click on the magnifying glass in the input bar to search for your item, after yo
      - url: /local/mass-search-card.js
        type: module
 
-# Usage
-
-```yaml
-type: custom:mass-search-card
-language: en
-
-## Optional Configuration
+# Usage and configuration
+      ````yaml
+      type: custom:mass-search-card
+      language: en
+      ````
+   Optional Configuration
    language: Set the language of the card. Supported languages: en, nl.
    Default: en
 
