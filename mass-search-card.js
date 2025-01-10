@@ -55,6 +55,8 @@ class MassSearchCard extends HTMLElement {
           const language = this.config.language || this.hass?.language || 'en';
           const t = translations[language] || translations.en;
           this.selectedMediaPlayer = null;
+          const configEntryId = hass.config.entries
+            .filter((entry) => entry.domain === "music_assistant")[0]?.entry_id;
   
         // Maak een eigen invoerveld
         const inputContainer = document.createElement('div');
@@ -101,7 +103,7 @@ class MassSearchCard extends HTMLElement {
                     service_data: {
                         name: query,
                         media_type: mediaType,
-                        config_entry_id: '01JGYD55TKXFB3GH8SBTR4W194',
+                        config_entry_id: configEntryId,
                         limit: limit,
                         library_only: libraryOnly,
                     },
