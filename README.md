@@ -39,8 +39,9 @@ Click on the magnifying glass in the input bar to search for your item, after yo
        type: module
 
 # Usage
+```
 type: custom:mass-search-card
-language: en       
+language: en```     
 
 **Optional Configuration**
    language: Set the language of the card. Supported languages: en, nl.
