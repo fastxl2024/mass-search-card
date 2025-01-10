@@ -33,7 +33,7 @@ Click on the magnifying glass in the input bar to search for your item, after yo
 1. Download the mass-search-card.js file from this repository.
 2. Place the file in the /www folder of your Home Assistant configuration.
 3. Add the following line to your Lovelace resources:
-   yaml
+   ```yaml
    resources:
      - url: /local/mass-search-card.js
        type: module
@@ -41,9 +41,9 @@ Click on the magnifying glass in the input bar to search for your item, after yo
 # Usage
 
 ```type: custom:mass-search-card
-language: en```     
+   language: en
 
-# **Optional Configuration**
+## Optional Configuration
    language: Set the language of the card. Supported languages: en, nl.
    Default: en
 
