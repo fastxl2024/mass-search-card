@@ -39,13 +39,14 @@ Click on the magnifying glass in the input bar to search for your item, after yo
        type: module
 
 # Usage and configuration
-      ````yaml
+   ````yaml
       type: custom:mass-search-card
       language: en
-      ````
-   Optional Configuration
-   language: Set the language of the card. Supported languages: en, nl.
+   ````
+   **Optional Configuration:**
+   ````language: Set the language of the card. Supported languages: en, nl.
    Default: en
+   ````
 
 **Feel free to add some languages!**
 
