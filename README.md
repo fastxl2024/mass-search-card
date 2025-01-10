@@ -44,8 +44,9 @@ Click on the magnifying glass in the input bar to search for your item, after yo
       language: en
    ````
    **Optional Configuration:**
-   ````language: Set the language of the card. Supported languages: en, nl.
-   Default: en
+   ````yaml
+      language: Set the language of the card. Supported languages: en, nl.
+      Default: en
    ````
 
 **Feel free to add some languages!**
