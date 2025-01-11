@@ -4,10 +4,4 @@
   "render_readme": true,
   "filename": "mass-search-card.js",
   "homeassistant": "2023.9.0"
-  "resources": [
-    {
-      "type": "module",
-      "url": "/hacsfiles/mass-card-search/src/mass-search-card.js"
-    }
-  ]
 }
