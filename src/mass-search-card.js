@@ -229,7 +229,7 @@ class MassSearchCard extends HTMLElement {
         titleContainer.style.gap = '16px';
 
         const titleImage = document.createElement('img');
-        titleImage.src = new URL('./images/mass_logo.png', import.meta.url).href;
+        titleImage.src = new URL('/hacsfiles/mass-search-card/images/mass_logo.png', import.meta.url).href;
 //        titleImage.src = 'https://avatars.githubusercontent.com/u/71128003?s=200&v=4';
         titleImage.alt = 'Music Assistant Logo';
         titleImage.style.width = '65px';
