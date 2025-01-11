@@ -18,7 +18,6 @@ class MassSearchCard extends HTMLElement {
               radio_label: 'Radio',
               library_only_label: 'Lokaal',
               search_button: 'Zoeken',
-              clear_button: 'Wissen',
               unknown_artist: 'Onbekende artiest',
               unknown_duration: 'Onbekende duur',
               no_results: 'Geen resultaten gevonden.',
@@ -28,6 +27,7 @@ class MassSearchCard extends HTMLElement {
               dropdown_label_media_player: 'Selecteer een media player',
               close_button: 'Sluiten',
               title_text: 'Zoek in Music Assistant',
+              select_media_type: 'Selecteer media type',
             },
             en: {
               search_placeholder: 'Type your search term here...',
@@ -39,7 +39,6 @@ class MassSearchCard extends HTMLElement {
               radio_label: 'Radio',
               library_only_label: 'Local library',
               search_button: 'Search',
-              clear_button: 'Clear',
               unknown_artist: 'Unknown artist',
               unknown_duration: 'Unknown duration',
               no_results: 'No results found.',
@@ -49,14 +48,15 @@ class MassSearchCard extends HTMLElement {
               dropdown_label_media_player: 'Select a media player',
               close_button: 'Close',
               title_text: 'Search in Music Assistant',
+              select_media_type: 'Select media type',
             },
           };
       
           const language = this.config.language || this.hass?.language || 'en';
           const t = translations[language] || translations.en;
           this.selectedMediaPlayer = null;
-          const configEntryId = hass.config.entries
-            .filter((entry) => entry.domain === "music_assistant")[0]?.entry_id;
+//          this.configEntryId = null;
+          this.configEntryId = '';
   
         // Maak een eigen invoerveld
         const inputContainer = document.createElement('div');
@@ -93,6 +93,7 @@ class MassSearchCard extends HTMLElement {
                 const query = input.value.trim();
                 const mediaType = selectedMediaType; // Geselecteerde waarde van de dropdown
                 const mediaPlayer = this.selectedMediaPlayer;
+                const configEntryId = this.configEntryId;
                 const limit = parseInt(inputlimitresults.value, 10) || 8;
                 const libraryOnly = checkbox.checked; // Checkbox voor lokale bibliotheek
         
@@ -104,6 +105,7 @@ class MassSearchCard extends HTMLElement {
                         name: query,
                         media_type: mediaType,
                         config_entry_id: configEntryId,
+                        //'01JGYD55TKXFB3GH8SBTR4W194'
                         limit: limit,
                         library_only: libraryOnly,
                     },
@@ -111,11 +113,11 @@ class MassSearchCard extends HTMLElement {
                 };
                 if (!mediaPlayer) {
                     // Toon een waarschuwing als er geen speler is geselecteerd
-                    alert('Selecteer een media player!');
+                    alert(t.dropdown_label_media_player);
                     return;
                 }
                 if (!mediaType) {
-                    alert('Media type is niet gedefinieerd!');
+                    alert(t.select_media_type);
                     return;
                 }
                 try {
@@ -218,7 +220,7 @@ class MassSearchCard extends HTMLElement {
         wrapper.style.backgroundColor = 'var(--card-background-color)';
         wrapper.style.padding = '16px';
         wrapper.style.gap = '16px';
-        wrapper.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'; // Optionele schaduw voor een strakker uiterlijk
+        wrapper.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'; 
 
         // Voeg een afbeelding toe als titel bovenaan
         const titleContainer = document.createElement('div');
@@ -227,7 +229,8 @@ class MassSearchCard extends HTMLElement {
         titleContainer.style.gap = '16px';
 
         const titleImage = document.createElement('img');
-        titleImage.src = 'https://avatars.githubusercontent.com/u/71128003?s=200&v=4'; // Vervang door de URL van de gewenste afbeelding
+        titleImage.src = new URL('./images/mass_logo.png', import.meta.url).href;
+//        titleImage.src = 'https://avatars.githubusercontent.com/u/71128003?s=200&v=4';
         titleImage.alt = 'Music Assistant Logo';
         titleImage.style.width = '65px';
         titleImage.style.borderRadius = '8px';
@@ -452,28 +455,29 @@ class MassSearchCard extends HTMLElement {
         popupTitle.style.marginBottom = '16px';
         popup.appendChild(popupTitle);
     
-        // Helper functions
-        async function convertImageToBase64(url) {
-            const corsProxy = 'https://crossorigin.me/';
-            const proxiedUrl = corsProxy + url;
-        
-            try {
-                const response = await fetch(proxiedUrl);
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            
-                const blob = await response.blob();
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = (err) => reject(err);
-                    reader.readAsDataURL(blob);
-                });
-            } catch (error) {
-                console.error('Error fetching image:', error);
-                return null;  // Return null if there is an error
-            }
-        }
+//        // Helper functions
+//        async function convertImageToBase64(url) {
+//            const corsProxy = 'https://crossorigin.me/';
+//            const proxiedUrl = corsProxy + url;
+//        
+//            try {
+//                const response = await fetch(proxiedUrl);
+//                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+//            
+//                const blob = await response.blob();
+//                return new Promise((resolve, reject) => {
+//                    const reader = new FileReader();
+//                    reader.onloadend = () => resolve(reader.result);
+//                    reader.onerror = (err) => reject(err);
+//                    reader.readAsDataURL(blob);
+//                });
+//            } catch (error) {
+//                console.error('Error fetching image:', error);
+//                return null;  // Return null if there is an error
+//            }
+//        }
 
+        // Helper function to create an image container
         function createImageContainer(imageUrl) {
             const imageContainer = document.createElement('div');
             imageContainer.style.flex = '0 0 50px';
@@ -486,10 +490,16 @@ class MassSearchCard extends HTMLElement {
             image.style.height = '40px';
             image.style.borderRadius = '50%';
             image.style.objectFit = 'cover';
-        
-            image.src = imageUrl || 'https://www.ox-fanzine.de/mediadb/cache/400x/nocover.jpg'; // Fallback image
+            // Controleer of imageUrl begint met "http" en niet "https"
+            if (imageUrl && imageUrl.startsWith('http') && !imageUrl.startsWith('https')) {
+                console.warn('Insecure HTTP URL detected, using fallback image.');
+                image.src = new URL('./images/nocover.jpg', import.meta.url).href; // Fallback image
+            } else {
+                image.src = imageUrl || new URL('./images/nocover.jpg', import.meta.url).href; // Gebruik imageUrl of fallback
+            }
         
             imageContainer.appendChild(image);
+        
             return imageContainer;
         }
 
@@ -536,21 +546,21 @@ class MassSearchCard extends HTMLElement {
         
             if (uri.includes('ytmusic')) {
                 const youtubeIcon = document.createElement('img');
-                youtubeIcon.src = 'https://img.icons8.com/fluency/48/youtube-music.png';
+                youtubeIcon.src = new URL('./images/youtube_music.png', import.meta.url).href;
                 youtubeIcon.alt = 'youtube-music';
                 icons.push(youtubeIcon);
             }
         
             if (uri.includes('spotify')) {
                 const spotifyIcon = document.createElement('img');
-                spotifyIcon.src = 'https://img.icons8.com/fluency/48/spotify.png';
+                spotifyIcon.src = new URL('./images/spotify.png', import.meta.url).href;
                 spotifyIcon.alt = 'spotify';
                 icons.push(spotifyIcon);
             }
         
             if (uri.includes('library')) {
                 const libraryIcon = document.createElement('img');
-                libraryIcon.src = 'https://img.icons8.com/material-two-tone/48/book-shelf.png';
+                libraryIcon.src = new URL('./images/book_shelf.png', import.meta.url).href;
                 libraryIcon.alt = 'library';
                 icons.push(libraryIcon);
             }
@@ -602,7 +612,7 @@ class MassSearchCard extends HTMLElement {
                 const isRadio = mediaItem.uri && mediaItem.uri.includes('radio');
                 const isPlaylist = mediaItem.uri && mediaItem.uri.includes('playlist');
             
-                let imageUrl = mediaItem.image || await convertImageToBase64(mediaItem.image);
+                let imageUrl = mediaItem.image; //|| await convertImageToBase64(mediaItem.image);
                 const imageContainer = createImageContainer(imageUrl);
             
                 // For Tracks or Albums, handle the text and title accordingly
@@ -677,7 +687,6 @@ class MassSearchCard extends HTMLElement {
                 entity_id: entityId,
                 name: hass.states[entityId].attributes.friendly_name || entityId,
             }));
-
         //console.log('Filtered media_player entities:', this.mediaPlayerEntities);
 
         // Select dropdown content
@@ -686,6 +695,14 @@ class MassSearchCard extends HTMLElement {
             console.error('Dropdown content element not found.');
             return;
         }
+
+        // Filter op config_entry_id van de music_assistant integratie  
+        this._hass.callApi('GET', 'config/config_entries/entry').then((entries) => {
+            // Zoek de config entry voor 'music_assistant'
+            const musicAssistantEntry = entries.find((entry) => entry.domain === 'music_assistant');
+            this.configEntryId = musicAssistantEntry ? musicAssistantEntry.entry_id : 'Not found';
+          console.log("Music Assistant Config Entry ID:", this.configEntryId);
+        });
 
         dropdownContent1.innerHTML = ''; // Clear previous options
 
