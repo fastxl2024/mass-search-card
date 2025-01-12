@@ -2,7 +2,7 @@
   "name": "Mass Search Card",
   "content_in_root": false,
   "render_readme": true,
-  "filename": "/src/mass-search-card.js",
+  "filename": "src/mass-search-card.js",
   "homeassistant": "2023.9.0",
   "extra_files": [
     "images/*"
