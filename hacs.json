@@ -5,7 +5,6 @@
   "filename": "src/mass-search-card.js",
   "homeassistant": "2023.9.0",
   "extra_files": [
-    "images/book_shelf.png",
-    "images/mass_logo.png"
+    "images/*"
   ]
 }
