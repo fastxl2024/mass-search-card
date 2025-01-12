@@ -1,10 +1,7 @@
 {
   "name": "Mass Search Card",
-  "content_in_root": false,
+  "content_in_root": true,
   "render_readme": true,
   "filename": "mass-search-card.js",
-  "homeassistant": "2023.9.0",
-  "extra_files": [
-    "images/*"
-  ]
+  "homeassistant": "2023.9.0"
 }
