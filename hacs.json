@@ -1,8 +1,6 @@
 {
-  "name": "Mass Search Card",
-  "content_in_root": true,
-  "render_readme": true,
-  "domains": ["lovelace"],
-  "homeassistant": "2023.9.0",
-  "filename": "mass-search-card.js"
+    "name": "Mass Search Card",
+    "content_in_root": true,
+    "file_name": "mass-search-card.js",
+    "render_readme": true
 }
