@@ -8,9 +8,8 @@ Click on the magnifying glass in the input bar to search for your item, after yo
 - Supports searching for artists, tracks, albums, playlists, and radio stations.
 - Dynamic dropdown selection for media players and media types.
 - Popup display for search results with detailed information.
-- Multi-language support (English and Dutch).
+- Multi-language support (English, Dutch and Swedish).
 - Easy integration with Music Assistant.
-- Languages are English, Dutch, Swedish
 
 ## Screenshots
 
