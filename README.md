@@ -10,6 +10,7 @@ Click on the magnifying glass in the input bar to search for your item, after yo
 - Popup display for search results with detailed information.
 - Multi-language support (English and Dutch).
 - Easy integration with Music Assistant.
+- Languages are English, Dutch, Swedish
 
 ## Screenshots
 
