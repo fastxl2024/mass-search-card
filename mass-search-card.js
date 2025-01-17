@@ -50,12 +50,32 @@ class MassSearchCard extends HTMLElement {
               title_text: 'Search in Music Assistant',
               select_media_type: 'Select media type',
             },
+            sv: {
+                search_placeholder: 'Sök här…',
+                results_label: 'Antal resultat,
+                artist_label: 'Artist',
+                track_label: 'Spår',
+                album_label: 'Album',
+                playlist_label: 'Spellista',
+                radio_label: 'Radio',
+                library_only_label: 'Endast bibliotek,
+                search_button: 'Sök',
+                unknown_artist: 'Okänd artist',
+                unknown_duration: 'Okänd varaktighet',
+                no_results: 'Inga resultat funna.',
+                error_fetching: 'Ett fel uppstod när resultat hämtades.',
+                playing_media: 'Media spelad:',
+                popup_title: 'Sökresultat för:',
+                dropdown_label_media_player: 'Välj mediaspelare',
+                close_button: 'Stäng',
+                title_text: 'Sök i Music Assistant',
+                select_media_type: 'Välj mediatyp',
+            },  
           };
       
           const language = this.config.language || this.hass?.language || 'en';
           const t = translations[language] || translations.en;
           this.selectedMediaPlayer = null;
-//          this.configEntryId = null;
           this.configEntryId = '';
   
         // Maak een eigen invoerveld
