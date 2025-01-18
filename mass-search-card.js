@@ -7,6 +7,28 @@ class MassSearchCard extends HTMLElement {
             
         }
 
+        // Voeg de media query toe voor kleinere schermen
+        const style = document.createElement('style');
+        style.textContent = `
+          @media (max-width: 600px) {
+            .dropdown-button, .input-container, .button-container {
+              width: 100%; /* Allow full width for smaller screens */
+            }
+            .popup {
+              max-width: 90vw; /* Scale down the popup for mobile */
+            }
+            .icon {
+              font-size: 20px; /* Reduce icon size */
+            }
+            .button {
+              font-size: 14px; /* Adjust font size for better readability */
+            }
+          }
+        `;
+        
+        // Voeg de stijl toe aan de shadowRoot
+        this.shadowRoot.appendChild(style);        
+
         const translations = {
             nl: {
                 album_label: 'Album',
@@ -260,11 +282,13 @@ class MassSearchCard extends HTMLElement {
         wrapper.style.display = 'flex';
         wrapper.style.flexDirection = 'column';
         wrapper.style.border = '1px solid var(--primary-color)';
-        wrapper.style.borderRadius = '16px'; // Ronde hoeken
+        wrapper.style.borderRadius = '16px';
         wrapper.style.backgroundColor = 'var(--card-background-color)';
         wrapper.style.padding = '16px';
         wrapper.style.gap = '16px';
-        wrapper.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'; 
+        wrapper.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        wrapper.style.width = '100%'; // Ensure it scales with the screen width
+        wrapper.style.boxSizing = 'border-box';
 
         // Voeg een afbeelding toe als titel bovenaan
         const titleContainer = document.createElement('div');
