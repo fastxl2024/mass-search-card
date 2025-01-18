@@ -393,7 +393,9 @@ class MassSearchCard extends HTMLElement {
         dropdownContent1.style.borderRadius = '8px';
         dropdownContent1.style.backgroundColor = 'var(--card-background-color)';
         dropdownContent1.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        dropdownContent1.style.zIndex = '10';
         dropdownContent1.classList.add('dropdown-content1');
+
 
         
         // Toggle dropdown bij klikken op de knop
@@ -449,6 +451,7 @@ class MassSearchCard extends HTMLElement {
         dropdownContent2.style.borderRadius = '8px';
         dropdownContent2.style.backgroundColor = 'var(--card-background-color)';
         dropdownContent2.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        dropdownContent2.style.zIndex = '10';
         
         const options = [
             { value: 'artist', label: t.artist_label },
