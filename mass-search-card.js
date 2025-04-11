@@ -139,7 +139,7 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Skladba',
                 unknown_artist: 'Neznámý umělec',
                 unknown_duration: 'Neznámá délka',                
-            },              
+            }
           };
       
           const language = this.config.language || this.hass?.language || 'en';
@@ -221,7 +221,7 @@ class MassSearchCard extends HTMLElement {
                         } else {
                             title = `${t.popup_title} "${query}" (${mediaType})`;
                         }
-                        this.showPopup(response, title);
+                        this.showPopup(response, title, t);
                     }
                 } catch (error) {
                     console.error('Error during service call:', error);
@@ -518,7 +518,7 @@ class MassSearchCard extends HTMLElement {
 
     }
 
-    showPopup(response, title) {
+    showPopup(response, title, t) {
         // Maak een popup-container
         const popupContainer = document.createElement('div');
         popupContainer.style.position = 'fixed';
@@ -750,7 +750,7 @@ class MassSearchCard extends HTMLElement {
         }
 
         const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
+        closeButton.textContent = t.close_button;
         closeButton.style.marginTop = '16px';
         closeButton.style.padding = '8px 16px';
         closeButton.style.border = 'none';
