@@ -3,7 +3,7 @@
   "content_in_root": false,
   "filename": "mass-search-card.js",
   "render_readme": true,
-  "description": "Zoek en speel media af via Music Assistant binnen Home Assistant.",
+  "description": "Search and play media using Music Assistant in Home Assistant",
   "type": "lovelace",
   "authors": ["@fastxl2024"],
   "domains": [],
