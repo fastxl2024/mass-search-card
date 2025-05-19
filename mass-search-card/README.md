@@ -8,7 +8,7 @@ Click on the magnifying glass in the input bar to search for your item, after yo
 - Supports searching for artists, tracks, albums, playlists, and radio stations.
 - Dynamic dropdown selection for media players and media types.
 - Popup display for search results with detailed information.
-- Multi-language support (English, Dutch, Czech and Swedish).
+- Multi-language support (English, Dutch, Czech, Swedish, Slovak).
 - Easy integration with Music Assistant.
 
 ## Screenshots
@@ -45,7 +45,7 @@ Click on the magnifying glass in the input bar to search for your item, after yo
    ````
    **Optional Configuration:**
    ````yaml
-      language: Set the language of the card. Supported languages: cz, en, nl, sv.
+      language: Set the language of the card. Supported languages: cz, en, nl, sv, sk.
       Default: en
    ````
 
