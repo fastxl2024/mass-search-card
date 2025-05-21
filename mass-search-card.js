@@ -234,7 +234,7 @@ class MassSearchCard extends HTMLElement {
         // Samenvoegen
         inputContainer.appendChild(input);
         inputContainer.appendChild(icon_searchbar);
-        document.body.appendChild(inputContainer);
+        wrapper.appendChild(inputContainer);
 
         const searchsettingContainer = document.createElement('div');
         searchsettingContainer.style.display = 'flex';
@@ -296,8 +296,7 @@ class MassSearchCard extends HTMLElement {
 
         searchsettingContainer.appendChild(inputlimitresultsContainer);
         searchsettingContainer.appendChild(checkboxContainer);
-        document.body.appendChild(searchsettingContainer);
-
+        wrapper.appendChild(searchsettingContainer);    
 
         // Maak een eigen wrapper voor alle elementen
         const wrapper = document.createElement('div');
