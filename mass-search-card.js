@@ -4,30 +4,25 @@ class MassSearchCard extends HTMLElement {
 
         if (!this.shadowRoot) {
             this.attachShadow({ mode: 'open' });
-            
         }
 
-        // Voeg de media query toe voor kleinere schermen
         const style = document.createElement('style');
         style.textContent = `
-          @media (max-width: 600px) {
+        @media (max-width: 600px) {
             .dropdown-button, .input-container, .button-container {
-              width: 100%; /* Allow full width for smaller screens */
+            width: 100%;
             }
             .popup {
-              max-width: 90vw; /* Scale down the popup for mobile */
+            max-width: 90vw;
             }
             .icon {
-              font-size: 20px; /* Reduce icon size */
+            font-size: 20px;
             }
             .button {
-              font-size: 14px; /* Adjust font size for better readability */
+            font-size: 14px;
             }
-          }
-        `;
-        
-        // Voeg de stijl toe aan de shadowRoot
-        this.shadowRoot.appendChild(style);        
+        }
+        `;     
 
         const translations = {
             nl: {
@@ -142,10 +137,10 @@ class MassSearchCard extends HTMLElement {
             },              
           };
       
-          const language = this.config.language || this.hass?.language || 'en';
-          const t = translations[language] || translations.en;
-          this.selectedMediaPlayer = null;
-          this.configEntryId = '';
+        const language = this.config.language || this.hass?.language || 'en';
+        const t = translations[language] ?? translations.en;
+        this.selectedMediaPlayer = null;
+        this.configEntryId = '';
   
         // Maak een eigen invoerveld
         const inputContainer = document.createElement('div');
@@ -180,7 +175,7 @@ class MassSearchCard extends HTMLElement {
         icon_searchbar.addEventListener('click', async () => {
             if (this.hass) {
                 const query = input.value.trim();
-                const mediaType = selectedMediaType; // Geselecteerde waarde van de dropdown
+                const mediaType = this.selectedMediaType; // Geselecteerde waarde van de dropdown
                 const mediaPlayer = this.selectedMediaPlayer;
                 const configEntryId = this.configEntryId;
                 const limit = parseInt(inputlimitresults.value, 10) || 8;
@@ -356,6 +351,7 @@ class MassSearchCard extends HTMLElement {
             
         // Maak de dropdown-knop
         const dropdownButton1 = document.createElement('button');
+        dropdownButton1.classList.add('dropdown-button');
         dropdownButton1.textContent = t.dropdown_label_media_player;
         dropdownButton1.style.width = '225px';
         dropdownButton1.style.border = '1px solid var(--primary-color)';
@@ -404,7 +400,6 @@ class MassSearchCard extends HTMLElement {
         });
         
         // Voeg de dropdown-inhoud toe aan de container
-        dropdown1.appendChild(dropdownButton1);
         dropdown1.appendChild(dropdownContent1);
 
         // Maak de dropdown container
@@ -461,7 +456,7 @@ class MassSearchCard extends HTMLElement {
             { value: 'radio', label: 'Radio' },
         ];
         
-        let selectedMediaType = ''; // Standaardwaarde
+        this.selectedMediaType = ''; // Standaardwaarde
 
         options.forEach(option => {
             const dropdownOption = document.createElement('div');
@@ -472,7 +467,7 @@ class MassSearchCard extends HTMLElement {
             
             // Klik-event voor het selecteren van een optie
             dropdownOption.addEventListener('click', () => {
-                selectedMediaType = option.value; // Stel de waarde in
+                this.selectedMediaType = option.value; // Stel de waarde in
                 dropdownButton2.textContent = option.label; // Toon label in de knop
                 dropdownButton2.appendChild(dropdownIcon2); // Re-add icon after changing text
                 dropdownContent2.style.display = 'none'; // Verberg de dropdown
@@ -503,7 +498,6 @@ class MassSearchCard extends HTMLElement {
         buttonContainer.appendChild(icon);
         buttonContainer.appendChild(dropdown1);
         buttonContainer.appendChild(dropdown2);
-        wrapper.appendChild(buttonContainer);
 
         // Voeg de kaarten en invoer toe aan de wrapper
         wrapper.appendChild(titleContainer);    
@@ -724,10 +718,10 @@ class MassSearchCard extends HTMLElement {
                 button.appendChild(iconContainer);
             
                 // Handle button click for Track or Album
-                let selectedMediaType = '';
-                let selectedMediaPlayer = this.selectedMediaPlayer;
-            
                 button.addEventListener('click', async () => {
+                let selectedMediaPlayer = this.selectedMediaPlayer;
+                let selectedMediaType = this.selectedMediaType;
+
                     try {
                         await this.hass.callService('music_assistant', 'play_media', {
                             entity_id: selectedMediaPlayer,
@@ -750,7 +744,7 @@ class MassSearchCard extends HTMLElement {
         }
 
         const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
+        closeButton.textContent = t.close_button;
         closeButton.style.marginTop = '16px';
         closeButton.style.padding = '8px 16px';
         closeButton.style.border = 'none';
@@ -807,7 +801,7 @@ class MassSearchCard extends HTMLElement {
                 option.style.cursor = 'pointer';
                 option.style.borderBottom = '1px solid var(--divider-color)';
                 option.addEventListener('click', () => {
-                    const dropdownButton1 = this.shadowRoot.querySelector('div > button');
+                    const dropdownButton1 = this.shadowRoot.querySelector('.dropdown-button');
 
                     // Update selected media player directly
                     this.selectedMediaPlayer = entity.entity_id; // Directly set the selected media player
