@@ -6,6 +6,8 @@ class MassSearchCard extends HTMLElement {
             this.attachShadow({ mode: 'open' });
         }
 
+        this._isInitialized = true; // ✅ markeer component als klaar        
+
         const style = document.createElement('style');
         style.textContent = `
         @media (max-width: 600px) {
@@ -541,28 +543,6 @@ class MassSearchCard extends HTMLElement {
         popupTitle.style.color = 'var(--primary-text-color)';
         popupTitle.style.marginBottom = '16px';
         popup.appendChild(popupTitle);
-    
-//        // Helper functions
-//        async function convertImageToBase64(url) {
-//            const corsProxy = 'https://crossorigin.me/';
-//            const proxiedUrl = corsProxy + url;
-//        
-//            try {
-//                const response = await fetch(proxiedUrl);
-//                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-//            
-//                const blob = await response.blob();
-//                return new Promise((resolve, reject) => {
-//                    const reader = new FileReader();
-//                    reader.onloadend = () => resolve(reader.result);
-//                    reader.onerror = (err) => reject(err);
-//                    reader.readAsDataURL(blob);
-//                });
-//            } catch (error) {
-//                console.error('Error fetching image:', error);
-//                return null;  // Return null if there is an error
-//            }
-//        }
 
         // Helper function to create an image container
         function createImageContainer(imageUrl) {
@@ -777,11 +757,12 @@ class MassSearchCard extends HTMLElement {
         //console.log('Filtered media_player entities:', this.mediaPlayerEntities);
 
         // Select dropdown content
-        const dropdownContent1 = this.shadowRoot.querySelector('.dropdown-content1');
-        if (!dropdownContent1) {
-            console.error('Dropdown content element not found.');
-            return;
+// Wacht tot DOM volledig is opgebouwd
+        if (!this.shadowRoot || !this.shadowRoot.querySelector('.dropdown-content1')) {
+            return; // DOM is nog niet klaar, probeer later opnieuw
         }
+
+        const dropdownContent1 = this.shadowRoot.querySelector('.dropdown-content1');
 
         // Filter op config_entry_id van de music_assistant integratie  
         this._hass.callApi('GET', 'config/config_entries/entry').then((entries) => {
