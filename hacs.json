@@ -3,5 +3,6 @@
   "content_in_root": false,
   "file_name": "mass-search-card.js",
   "render_readme": true,
+  "renderers": ["mass-search-card"],
   "type": "lovelace"
 }
