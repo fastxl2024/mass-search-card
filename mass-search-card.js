@@ -1,3 +1,9 @@
+/**
+ * @customElement
+ * @cardType mass-search-card
+ * @description Search and play media using Music Assistant in Home Assistant
+ */
+
 class MassSearchCard extends HTMLElement {
     async setConfig(config) {
         this.config = config;
