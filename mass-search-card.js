@@ -145,7 +145,29 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Skladba',
                 unknown_artist: 'Neznámý umělec',
                 unknown_duration: 'Neznámá délka',                
-            }             
+            },
+            fr: {
+                album_label: 'Album',
+                artist_label: 'Artiste',
+                close_button: 'Fermer',
+                dropdown_label_media_player: 'Sélectionner un lecteur multimédia',
+                error_fetching: 'Une erreur est survenue lors de la récupération des résultats.',
+                library_only_label: 'Local',
+                media_type: 'Type de média',
+                no_results: 'Aucun résultat trouvé.',
+                playing_media: 'Média en cours de lecture :',
+                playlist_label: 'Playlist',
+                popup_title: 'Résultats de recherche pour :',
+                radio_label: 'Radio',
+                results_label: 'Nombre de résultats',
+                search_button: 'Rechercher',
+                search_placeholder: 'Tapez ici votre recherche...',
+                select_media_type: 'Sélectionner un type de média',
+                title_text: 'Rechercher dans Music Assistant',
+                track_label: 'Morceau',
+                unknown_artist: 'Artiste inconnu',
+                unknown_duration: 'Durée inconnue',
+            }      
           };
       
           const language = this.config.language || this.hass?.language || 'en';
