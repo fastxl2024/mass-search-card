@@ -992,11 +992,13 @@ class MassSearchCard extends HTMLElement {
 
             if (showEye) {
                 const eyeEl = document.createElement('span');
+                eyeEl.dataset.eye = 'true';
                 eyeEl.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="var(--primary-color)" style="display:block;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`;
                 eyeEl.style.display = 'flex';
                 eyeEl.style.alignItems = 'center';
                 eyeEl.style.marginLeft = '4px';
                 eyeEl.style.marginRight = '4px';
+                eyeEl.style.cursor = 'pointer';
                 iconContainer.insertBefore(eyeEl, iconContainer.firstChild);
             }
 
@@ -1070,11 +1072,17 @@ class MassSearchCard extends HTMLElement {
                 button.appendChild(textContainer);
                 button.appendChild(iconContainer);
             
-                button.addEventListener('click', () => {
-                    if (isAlbum || isPlaylist) {
-                        this.showTracklist(mediaItem, t, mediaPlayers);
-                        return;
+                if (isAlbum || isPlaylist) {
+                    const eyeEl = iconContainer.querySelector('[data-eye]');
+                    if (eyeEl) {
+                        eyeEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.showTracklist(mediaItem, t, mediaPlayers);
+                        });
                     }
+                }
+
+                button.addEventListener('click', () => {
                     this._playWithAnimation(button, async () => {
                         for (const playerId of mediaPlayers) {
                             await this.hass.callService('music_assistant', 'play_media', {
