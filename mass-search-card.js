@@ -79,6 +79,10 @@ class MassSearchCardEditor extends HTMLElement {
                 name: 'compact',
                 selector: { boolean: {} },
             },
+            {
+                name: 'default_results',
+                selector: { number: { min: 1, max: 100, step: 1, mode: 'box' } },
+            },
         ];
     }
 
@@ -89,7 +93,7 @@ class MassSearchCardEditor extends HTMLElement {
         form.data = this._config;
         form.schema = this._schema();
         form.computeLabel = (s) =>
-            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type', compact: 'Compacte weergave' }[s.name] || s.name);
+            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type', compact: 'Compacte weergave', default_results: 'Standaard aantal resultaten' }[s.name] || s.name);
         form.addEventListener('value-changed', (e) => {
             this.dispatchEvent(new CustomEvent('config-changed', {
                 detail: { config: e.detail.value },
@@ -375,7 +379,7 @@ class MassSearchCard extends HTMLElement {
                 const mediaType = selectedMediaType; // Geselecteerde waarde van de dropdown
                 const mediaPlayers = this.selectedMediaPlayers;
                 const configEntryId = this.configEntryId;
-                const limit = parseInt(inputlimitresults.value, 10) || 8;
+                const limit = this.config.default_results || parseInt(inputlimitresults.value, 10) || 8;
                 const libraryOnly = checkbox.checked;
                 const favoritesOnly = favoritesCheckbox.checked;
                 const selectedSort = sortSelect.value;
@@ -451,6 +455,7 @@ class MassSearchCard extends HTMLElement {
         inputlimitresultsContainer.style.position = 'relative';
         inputlimitresultsContainer.style.height = '48.4px';
         inputlimitresultsContainer.style.flex = '0 0 130px';
+        if (this.config.default_results) inputlimitresultsContainer.style.display = 'none';
 
         // Invoerveld maximale resultaten
         const inputlimitresults = document.createElement('input');
