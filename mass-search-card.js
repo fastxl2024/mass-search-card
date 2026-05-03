@@ -172,6 +172,8 @@ class MassSearchCard extends HTMLElement {
                 sort_name: 'Naam (A-Z)',
                 sort_artist: 'Artiest (A-Z)',
                 players_selected: '{n} spelers',
+                play_all: 'Alles afspelen',
+                loading: 'Laden...',
             },
             en: {
                 album_label: 'Album',
@@ -198,6 +200,8 @@ class MassSearchCard extends HTMLElement {
                 sort_name: 'Name (A-Z)',
                 sort_artist: 'Artist (A-Z)',
                 players_selected: '{n} players',
+                play_all: 'Play all',
+                loading: 'Loading...',
             },
             sv: {
                 album_label: 'Album',
@@ -224,6 +228,8 @@ class MassSearchCard extends HTMLElement {
                 sort_name: 'Namn (A-Ö)',
                 sort_artist: 'Artist (A-Ö)',
                 players_selected: '{n} spelare',
+                play_all: 'Spela alla',
+                loading: 'Laddar...',
             },
             cz: {
                 album_label: 'Album',
@@ -250,6 +256,8 @@ class MassSearchCard extends HTMLElement {
                 sort_name: 'Název (A-Z)',
                 sort_artist: 'Umělec (A-Z)',
                 players_selected: '{n} přehrávačů',
+                play_all: 'Přehrát vše',
+                loading: 'Načítání...',
             },
             fr: {
                 album_label: 'Album',
@@ -276,6 +284,8 @@ class MassSearchCard extends HTMLElement {
                 sort_name: 'Nom (A-Z)',
                 sort_artist: 'Artiste (A-Z)',
                 players_selected: '{n} lecteurs',
+                play_all: 'Tout lire',
+                loading: 'Chargement...',
             },
             sk: {
                 album_label: 'Album',
@@ -302,6 +312,8 @@ class MassSearchCard extends HTMLElement {
                 sort_name: 'Názov (A-Z)',
                 sort_artist: 'Umelec (A-Z)',
                 players_selected: '{n} prehrávačov',
+                play_all: 'Prehrať všetko',
+                loading: 'Načítavanie...',
             }
           };
       
@@ -995,6 +1007,10 @@ class MassSearchCard extends HTMLElement {
                 button.appendChild(iconContainer);
             
                 button.addEventListener('click', async () => {
+                    if (isAlbum || isPlaylist) {
+                        this.showTracklist(mediaItem, t, mediaPlayers);
+                        return;
+                    }
                     try {
                         for (const playerId of mediaPlayers) {
                             await this.hass.callService('music_assistant', 'play_media', {
@@ -1034,6 +1050,213 @@ class MassSearchCard extends HTMLElement {
         popupContainer.appendChild(popup);
         this.shadowRoot.appendChild(popupContainer);
     }
+
+    showTracklist(parentItem, t, mediaPlayers) {
+        const overlayContainer = document.createElement('div');
+        overlayContainer.style.position = 'fixed';
+        overlayContainer.style.top = '0';
+        overlayContainer.style.left = '0';
+        overlayContainer.style.width = '100vw';
+        overlayContainer.style.height = '100vh';
+        overlayContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        overlayContainer.style.display = 'flex';
+        overlayContainer.style.alignItems = 'center';
+        overlayContainer.style.justifyContent = 'center';
+        overlayContainer.style.zIndex = '10000';
+
+        const panel = document.createElement('div');
+        panel.classList.add('popup');
+        panel.style.backgroundColor = 'var(--card-background-color)';
+        panel.style.borderRadius = '24px';
+        panel.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        panel.style.padding = '16px';
+        panel.style.width = '400px';
+        panel.style.maxHeight = '80vh';
+        panel.style.overflowY = 'auto';
+        panel.style.display = 'flex';
+        panel.style.flexDirection = 'column';
+        panel.style.gap = '8px';
+
+        // Header: cover + titel + artiest
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.alignItems = 'center';
+        header.style.gap = '12px';
+        header.style.marginBottom = '4px';
+
+        const coverImg = document.createElement('img');
+        coverImg.src = parentItem.image || '';
+        coverImg.style.width = '56px';
+        coverImg.style.height = '56px';
+        coverImg.style.borderRadius = '8px';
+        coverImg.style.objectFit = 'cover';
+        coverImg.style.flexShrink = '0';
+
+        const headerText = document.createElement('div');
+        headerText.style.flex = '1';
+        headerText.style.overflow = 'hidden';
+
+        const titleEl = document.createElement('div');
+        titleEl.textContent = parentItem.name;
+        titleEl.style.fontWeight = 'bold';
+        titleEl.style.fontSize = '16px';
+        titleEl.style.overflow = 'hidden';
+        titleEl.style.textOverflow = 'ellipsis';
+        titleEl.style.whiteSpace = 'nowrap';
+
+        headerText.appendChild(titleEl);
+
+        const artistName = parentItem.artists?.[0]?.name;
+        if (artistName) {
+            const artistEl = document.createElement('div');
+            artistEl.textContent = artistName;
+            artistEl.style.fontSize = '13px';
+            artistEl.style.color = 'var(--secondary-text-color)';
+            artistEl.style.overflow = 'hidden';
+            artistEl.style.textOverflow = 'ellipsis';
+            artistEl.style.whiteSpace = 'nowrap';
+            headerText.appendChild(artistEl);
+        }
+
+        header.appendChild(coverImg);
+        header.appendChild(headerText);
+        panel.appendChild(header);
+
+        // Play all knop
+        const playAllBtn = document.createElement('button');
+        playAllBtn.textContent = t.play_all;
+        playAllBtn.style.padding = '8px 16px';
+        playAllBtn.style.border = 'none';
+        playAllBtn.style.borderRadius = '24px';
+        playAllBtn.style.backgroundColor = 'var(--primary-color)';
+        playAllBtn.style.color = 'var(--card-background-color)';
+        playAllBtn.style.cursor = 'pointer';
+        playAllBtn.style.fontWeight = 'bold';
+        playAllBtn.style.alignSelf = 'flex-start';
+        playAllBtn.addEventListener('click', async () => {
+            const contentType = parentItem.uri.includes('playlist') ? 'playlist' : 'album';
+            try {
+                for (const playerId of mediaPlayers) {
+                    await this.hass.callService('music_assistant', 'play_media', {
+                        entity_id: playerId,
+                        media_type: contentType,
+                        media_id: parentItem.uri,
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+        panel.appendChild(playAllBtn);
+
+        // Laad-indicator
+        const loadingEl = document.createElement('p');
+        loadingEl.textContent = t.loading;
+        loadingEl.style.color = 'var(--secondary-text-color)';
+        loadingEl.style.textAlign = 'center';
+        loadingEl.style.margin = '8px 0';
+        panel.appendChild(loadingEl);
+
+        overlayContainer.appendChild(panel);
+        this.shadowRoot.appendChild(overlayContainer);
+
+        // Haal nummers op via browse_media
+        const entityId = mediaPlayers[0];
+        const contentType = parentItem.uri.includes('playlist') ? 'playlist' : 'album';
+
+        this.hass.connection.sendMessagePromise({
+            type: 'media_player/browse_media',
+            entity_id: entityId,
+            media_content_id: parentItem.uri,
+            media_content_type: contentType,
+        }).then(result => {
+            loadingEl.remove();
+            const tracks = result.children || [];
+
+            if (tracks.length === 0) {
+                const noTracks = document.createElement('p');
+                noTracks.textContent = t.no_results;
+                noTracks.style.color = 'var(--secondary-text-color)';
+                noTracks.style.textAlign = 'center';
+                panel.insertBefore(noTracks, closeBtn);
+                return;
+            }
+
+            tracks.forEach((track, index) => {
+                const trackRow = document.createElement('button');
+                trackRow.style.display = 'flex';
+                trackRow.style.alignItems = 'center';
+                trackRow.style.gap = '10px';
+                trackRow.style.padding = '8px 12px';
+                trackRow.style.border = '1px solid var(--divider-color)';
+                trackRow.style.borderRadius = '12px';
+                trackRow.style.backgroundColor = 'var(--card-background-color)';
+                trackRow.style.color = 'var(--primary-text-color)';
+                trackRow.style.cursor = 'pointer';
+                trackRow.style.width = '100%';
+                trackRow.style.textAlign = 'left';
+                trackRow.style.boxSizing = 'border-box';
+
+                const num = document.createElement('span');
+                num.textContent = String(index + 1);
+                num.style.fontSize = '12px';
+                num.style.color = 'var(--secondary-text-color)';
+                num.style.minWidth = '24px';
+                num.style.textAlign = 'right';
+                num.style.flexShrink = '0';
+
+                const trackTitle = document.createElement('span');
+                trackTitle.textContent = track.title;
+                trackTitle.style.flex = '1';
+                trackTitle.style.fontSize = '14px';
+                trackTitle.style.overflow = 'hidden';
+                trackTitle.style.textOverflow = 'ellipsis';
+                trackTitle.style.whiteSpace = 'nowrap';
+
+                trackRow.appendChild(num);
+                trackRow.appendChild(trackTitle);
+
+                trackRow.addEventListener('mouseover', () => { trackRow.style.backgroundColor = 'orange'; trackRow.style.color = 'white'; });
+                trackRow.addEventListener('mouseout', () => { trackRow.style.backgroundColor = 'var(--card-background-color)'; trackRow.style.color = 'var(--primary-text-color)'; });
+
+                trackRow.addEventListener('click', async () => {
+                    try {
+                        for (const playerId of mediaPlayers) {
+                            await this.hass.callService('music_assistant', 'play_media', {
+                                entity_id: playerId,
+                                media_type: 'track',
+                                media_id: track.media_content_id,
+                            });
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+
+                panel.insertBefore(trackRow, closeBtn);
+            });
+        }).catch(err => {
+            loadingEl.textContent = t.error_fetching;
+            console.error('Error fetching tracklist:', err);
+        });
+
+        // Sluit-knop
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = t.close_button;
+        closeBtn.style.marginTop = '8px';
+        closeBtn.style.padding = '8px 16px';
+        closeBtn.style.border = 'none';
+        closeBtn.style.borderRadius = '24px';
+        closeBtn.style.backgroundColor = 'var(--primary-color)';
+        closeBtn.style.color = 'var(--card-background-color)';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.alignSelf = 'center';
+        closeBtn.addEventListener('click', () => {
+            this.shadowRoot.removeChild(overlayContainer);
+        });
+        panel.appendChild(closeBtn);
+    }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
     set hass(hass) {
         this._hass = hass;
