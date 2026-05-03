@@ -814,7 +814,6 @@ class MassSearchCard extends HTMLElement {
         buttonContainer.appendChild(icon);
         buttonContainer.appendChild(dropdown1);
         buttonContainer.appendChild(dropdown2);
-        wrapper.appendChild(buttonContainer);
 
         const compact = this.config.compact === true;
         const hideSelectors = this.config.hide_selectors === true;
