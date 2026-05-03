@@ -1026,5 +1026,5 @@ window.customCards.push({
     type: 'mass-search-card',
     name: 'Mass Search Card',
     description: 'Search and play media using Music Assistant',
-    preview: false,
+    preview: true,
 });
