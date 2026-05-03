@@ -16,9 +16,7 @@ The **Mass Search Card** is a custom Lovelace card for Home Assistant that lets 
 
 ## Screenshots
 
-| Search card | Search results |
-|:-----------:|:--------------:|
-| ![Search card](images/search-card.png) | _coming soon_ |
+![Search card](images/search-card.png)
 
 ## Installation
 
@@ -69,15 +67,23 @@ All options are optional.
 | `language` | string | `en` | Interface language. Supported values: `en`, `nl`, `cz`, `sv`, `sk`, `fr` |
 | `default_player` | string | — | Pin a default Music Assistant media player (entity_id). Overrides the last-used player. |
 | `default_media_type` | string | — | Pin a default media type. One of: `track`, `album`, `artist`, `playlist`, `radio`. Overrides the last-used type. |
+| `default_results` | number | — | Pin a fixed number of search results. Hides the results input field in the card when set. |
+| `compact` | boolean | `false` | Hide the logo, title and settings row — shows only the search bar and player selector. |
+| `multiroom` | boolean | `false` | Allow selecting multiple players simultaneously for synchronised playback. |
+| `hide_selectors` | boolean | `false` | Hide the player and media type selector bar from the card. |
 
 The last used player and media type are automatically saved and restored across page reloads. Use `default_player` and `default_media_type` to lock a fixed selection.
 
-**Example with defaults:**
+**Example with all options:**
 ```yaml
 type: custom:mass-search-card
 language: nl
 default_player: media_player.living_room
 default_media_type: track
+default_results: 10
+compact: false
+multiroom: false
+hide_selectors: false
 ```
 
 ## Languages
