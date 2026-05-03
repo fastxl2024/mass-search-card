@@ -450,6 +450,9 @@ class MassSearchCard extends HTMLElement {
         searchsettingContainer.style.display = 'grid';
         searchsettingContainer.style.gridTemplateColumns = '1fr 1fr';
         searchsettingContainer.style.gap = '12px';
+        searchsettingContainer.style.width = '100%';
+        searchsettingContainer.style.boxSizing = 'border-box';
+        searchsettingContainer.style.minWidth = '0';
 
         // Maak een eigen invoerveld voor maximale resultaten
         const inputlimitresultsContainer = document.createElement('div');
@@ -461,6 +464,8 @@ class MassSearchCard extends HTMLElement {
         inputlimitresultsContainer.style.backgroundColor = 'var(--card-background-color)';
         inputlimitresultsContainer.style.position = 'relative';
         inputlimitresultsContainer.style.height = '48.4px';
+        inputlimitresultsContainer.style.minWidth = '0';
+        inputlimitresultsContainer.style.overflow = 'hidden';
         if (this.config.default_results) inputlimitresultsContainer.style.display = 'none';
 
         // Invoerveld maximale resultaten
@@ -550,6 +555,8 @@ class MassSearchCard extends HTMLElement {
         sortContainer.style.backgroundColor = 'var(--card-background-color)';
         sortContainer.style.height = '48.4px';
         sortContainer.style.gap = '6px';
+        sortContainer.style.minWidth = '0';
+        sortContainer.style.overflow = 'hidden';
 
         const sortLabel = document.createElement('span');
         sortLabel.textContent = t.sort_label;
