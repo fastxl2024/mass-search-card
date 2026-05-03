@@ -1,59 +1,93 @@
 # Mass Search Card
 
-The **Mass Search Card** is an advanced search card for Home Assistant, designed to simplify interaction with Music Assistant. This card allows you to effortlessly search for artists, tracks, albums, playlists, and radio stations and play them on your selected media players.
-Click on the magnifying glass in the input bar to search for your item, after you select a media_player en media type.
+The **Mass Search Card** is a custom Lovelace card for Home Assistant that lets you search and play music directly from [Music Assistant](https://music-assistant.io). Search for artists, tracks, albums, playlists, and radio stations, and play them instantly on any Music Assistant media player.
 
 ## Features
 
-- Supports searching for artists, tracks, albums, playlists, and radio stations.
-- Dynamic dropdown selection for media players and media types.
-- Popup display for search results with detailed information.
-- Multi-language support (English, Dutch, Czech, Swedish, Slovak, French).
-- Easy integration with Music Assistant.
+- Search for **artists, tracks, albums, playlists** and **radio stations**
+- Plays directly on any Music Assistant media player
+- Filter results by **local library** or **favourites only**
+- Configurable number of search results
+- **Default player and media type** — remembered automatically, or pinned via config
+- Visual **card editor** in the HA card browser (no YAML required)
+- **card-mod** compatible
+- Multi-language support: 🇬🇧 English, 🇳🇱 Dutch, 🇨🇿 Czech, 🇸🇪 Swedish, 🇸🇰 Slovak, 🇫🇷 French
+- Responsive layout — works on mobile and desktop
 
 ## Screenshots
 
-<div style="display: flex; align-items: flex-start; gap: 20px;"> <img src="https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9" alt="Search Panel" width="50%"> <img src="https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db" alt="Search Results" width="50%"> </div>
+> _Add screenshots here by uploading images to GitHub and replacing the placeholder URLs below._
+
+| Search card | Search results |
+|:-----------:|:--------------:|
+| ![Search card](https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9) | ![Search results](https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db) |
 
 ## Installation
 
-### HACS (Home Assistant Community Store)
-1. Ensure HACS is installed in your Home Assistant setup.
-2. Add this repository via HACS:
-   - Go to **HACS > Integrations** and click on **+**.
-   - Add the GitHub URL of this repository. (https://github.com/fastxl2024/mass-search-card.git)
-3. Search for `Mass Search Card` and install the card.
-4. Add the following line to your `Lovelace` resources:
+### HACS (recommended)
+
+1. Make sure [HACS](https://hacs.xyz) is installed.
+2. Add this repository as a custom repository in HACS:
+   - Go to **HACS → Frontend** and click the three-dot menu → **Custom repositories**
+   - Add `https://github.com/fastxl2024/mass-search-card` as category **Dashboard**
+3. Search for **Mass Search Card** and install it.
+4. Add the resource to your Lovelace configuration:
    ```yaml
    resources:
      - url: /hacsfiles/mass-search-card/mass-search-card.js
        type: module
+   ```
 
-# Manual Installation
-1. Download the mass-search-card.js file from this repository.
-2. Place the file in the /www folder of your Home Assistant configuration.
-3. Add the following line to your Lovelace resources:
+### Manual installation
+
+1. Download `mass-search-card.js` from this repository.
+2. Place the file in the `/www` folder of your Home Assistant configuration directory.
+3. Add the resource to your Lovelace configuration:
    ```yaml
    resources:
      - url: /local/mass-search-card.js
        type: module
+   ```
 
-# Usage and configuration
-   ````yaml
-      type: custom:mass-search-card
-      language: en
-   ````
-   **Optional Configuration:**
-   ````yaml
-      language: Set the language of the card. Supported languages: cz, en, nl, sv, sk, fr.
-      Default: en
-      default_player: Lock a default media player (entity_id, e.g. media_player.living_room).
-      default_media_type: Lock a default media type (track, album, artist, playlist, radio).
-   ````
-   The last used player and media type are automatically remembered via localStorage. Use `default_player` and `default_media_type` in the card config to pin a fixed default that overrides the remembered selection.
+## Usage
 
-**Feel free to add some languages!**
+Add the card to your dashboard via the card browser, or add it manually in YAML:
 
-**Known bugs:** 
-- scaling of card
-- no "icon" when item is in library
+```yaml
+type: custom:mass-search-card
+language: en
+```
+
+### Visual editor
+
+The card supports the built-in HA card editor. Click the pencil icon in the card browser to configure the card without editing YAML.
+
+## Configuration
+
+All options are optional.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `language` | string | `en` | Interface language. Supported values: `en`, `nl`, `cz`, `sv`, `sk`, `fr` |
+| `default_player` | string | — | Pin a default Music Assistant media player (entity_id). Overrides the last-used player. |
+| `default_media_type` | string | — | Pin a default media type. One of: `track`, `album`, `artist`, `playlist`, `radio`. Overrides the last-used type. |
+
+The last used player and media type are automatically saved and restored across page reloads. Use `default_player` and `default_media_type` to lock a fixed selection.
+
+**Example with defaults:**
+```yaml
+type: custom:mass-search-card
+language: nl
+default_player: media_player.living_room
+default_media_type: track
+```
+
+## Languages
+
+Feel free to contribute additional languages! The translation keys are defined at the top of `mass-search-card.js`.
+
+Currently supported: English (`en`), Dutch (`nl`), Czech (`cz`), Swedish (`sv`), Slovak (`sk`), French (`fr`).
+
+## Known issues
+
+- No artwork icon shown when an item is already in the local library
