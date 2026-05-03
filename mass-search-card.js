@@ -80,6 +80,14 @@ class MassSearchCardEditor extends HTMLElement {
                 selector: { boolean: {} },
             },
             {
+                name: 'multiroom',
+                selector: { boolean: {} },
+            },
+            {
+                name: 'hide_selectors',
+                selector: { boolean: {} },
+            },
+            {
                 name: 'default_results',
                 selector: { number: { min: 1, max: 100, step: 1, mode: 'box' } },
             },
@@ -93,7 +101,7 @@ class MassSearchCardEditor extends HTMLElement {
         form.data = this._config;
         form.schema = this._schema();
         form.computeLabel = (s) =>
-            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type', compact: 'Compacte weergave', default_results: 'Standaard aantal resultaten' }[s.name] || s.name);
+            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type', compact: 'Compacte weergave', multiroom: 'Multi-room (meerdere spelers)', hide_selectors: 'Verberg speler- en mediatypekeuze', default_results: 'Standaard aantal resultaten' }[s.name] || s.name);
         form.addEventListener('value-changed', (e) => {
             this.dispatchEvent(new CustomEvent('config-changed', {
                 detail: { config: e.detail.value },
@@ -790,12 +798,13 @@ class MassSearchCard extends HTMLElement {
         wrapper.appendChild(buttonContainer);
 
         const compact = this.config.compact === true;
+        const hideSelectors = this.config.hide_selectors === true;
 
         // Voeg de kaarten en invoer toe aan de wrapper
         if (!compact) wrapper.appendChild(titleContainer);
         wrapper.appendChild(inputContainer);
         if (!compact) wrapper.appendChild(searchsettingContainer);
-        wrapper.appendChild(buttonContainer);
+        if (!hideSelectors) wrapper.appendChild(buttonContainer);
 
         // Voeg de wrapper toe aan de shadow DOM
         this.shadowRoot.innerHTML = ''; // Wis bestaande inhoud
@@ -1122,19 +1131,30 @@ class MassSearchCard extends HTMLElement {
                 const lbl = document.createElement('span');
                 lbl.textContent = entity.name;
 
+                option.dataset.entityId = entity.entity_id;
                 option.appendChild(chk);
                 option.appendChild(lbl);
 
                 option.addEventListener('click', () => {
-                    const idx = this.selectedMediaPlayers.indexOf(entity.entity_id);
-                    if (idx === -1) {
-                        this.selectedMediaPlayers.push(entity.entity_id);
+                    if (this.config?.multiroom) {
+                        // Multi-select: toggle
+                        const idx = this.selectedMediaPlayers.indexOf(entity.entity_id);
+                        if (idx === -1) {
+                            this.selectedMediaPlayers.push(entity.entity_id);
+                        } else {
+                            this.selectedMediaPlayers.splice(idx, 1);
+                        }
+                        chk.checked = this.selectedMediaPlayers.includes(entity.entity_id);
                     } else {
-                        this.selectedMediaPlayers.splice(idx, 1);
+                        // Single-select: vervang selectie en sluit dropdown
+                        this.selectedMediaPlayers = [entity.entity_id];
+                        chk.checked = true;
+                        dropdownContent1.querySelectorAll('[data-entity-id]').forEach(o => {
+                            if (o !== option) o.querySelector('input[type="checkbox"]').checked = false;
+                        });
+                        dropdownContent1.style.display = 'none';
                     }
                     localStorage.setItem('mass-search-card-players', JSON.stringify(this.selectedMediaPlayers));
-                    chk.checked = !chk.checked;
-                    // Update button label
                     const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
                     if (btn) updatePlayerButtonLabel(btn);
                 });
@@ -1161,6 +1181,12 @@ class MassSearchCard extends HTMLElement {
             const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
             if (btn) updatePlayerButtonLabel(btn);
         }
+
+        // Sync checkboxes met huidige selectie
+        dropdownContent1.querySelectorAll('[data-entity-id]').forEach(opt => {
+            const chk = opt.querySelector('input[type="checkbox"]');
+            if (chk) chk.checked = this.selectedMediaPlayers.includes(opt.dataset.entityId);
+        });
 
         // Controleer of er een shadowRoot is en pas de status door aan child-elementen
         if (this.shadowRoot) {
