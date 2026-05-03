@@ -328,17 +328,13 @@ class MassSearchCard extends HTMLElement {
         searchsettingContainer.appendChild(inputlimitresultsContainer);
         searchsettingContainer.appendChild(checkboxContainer);
 
-        // Maak een eigen wrapper voor alle elementen
-        const wrapper = document.createElement('div');
+        // ha-card als wrapper zodat card-mod stijlen kan injecteren
+        const wrapper = document.createElement('ha-card');
         wrapper.style.display = 'flex';
         wrapper.style.flexDirection = 'column';
-        wrapper.style.border = '1px solid var(--primary-color)';
-        wrapper.style.borderRadius = '16px';
-        wrapper.style.backgroundColor = 'var(--card-background-color)';
         wrapper.style.padding = '16px';
         wrapper.style.gap = '16px';
-        wrapper.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        wrapper.style.width = '100%'; // Ensure it scales with the screen width
+        wrapper.style.width = '100%';
         wrapper.style.boxSizing = 'border-box';
 
         // Voeg een afbeelding toe als titel bovenaan
@@ -852,3 +848,11 @@ class MassSearchCard extends HTMLElement {
     }
 }
 customElements.define('mass-search-card', MassSearchCard);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: 'mass-search-card',
+    name: 'Mass Search Card',
+    description: 'Search and play media using Music Assistant',
+    preview: false,
+});
