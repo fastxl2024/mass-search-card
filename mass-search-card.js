@@ -47,6 +47,7 @@ class MassSearchCardEditor extends HTMLElement {
                 name: 'default_player',
                 selector: {
                     select: {
+                        mode: 'dropdown',
                         options: [
                             { value: '', label: '— geen standaard —' },
                             ...maPlayers,
