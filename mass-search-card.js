@@ -1016,7 +1016,7 @@ class MassSearchCard extends HTMLElement {
         return this._hass;
       }
     getCardSize() {
-        return 8; // Definieer de totale grootte van de gecombineerde kaarten
+        return 9;
     }
 }
 customElements.define('mass-search-card', MassSearchCard);
@@ -1026,5 +1026,5 @@ window.customCards.push({
     type: 'mass-search-card',
     name: 'Mass Search Card',
     description: 'Search and play media using Music Assistant',
-    preview: true,
+    preview: false,
 });
