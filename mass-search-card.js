@@ -17,7 +17,12 @@ class MassSearchCardEditor extends HTMLElement {
 
     set hass(hass) {
         this._hass = hass;
-        this._render();
+        if (this._form) {
+            this._form.hass = hass;
+            this._form.schema = this._schema();
+        } else {
+            this._render();
+        }
     }
 
     _schema() {
