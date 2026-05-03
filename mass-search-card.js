@@ -1146,13 +1146,28 @@ class MassSearchCard extends HTMLElement {
         header.style.gap = '12px';
         header.style.marginBottom = '4px';
 
-        const coverImg = document.createElement('img');
-        coverImg.src = parentItem.image || '';
-        coverImg.style.width = '56px';
-        coverImg.style.height = '56px';
-        coverImg.style.borderRadius = '8px';
-        coverImg.style.objectFit = 'cover';
-        coverImg.style.flexShrink = '0';
+        const coverPlaceholder = () => {
+            const ph = document.createElement('div');
+            ph.style.cssText = 'width:56px;height:56px;border-radius:8px;background:var(--primary-color,#ff9800);display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+            ph.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path fill="rgba(255,255,255,0.9)" d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z"/></svg>';
+            return ph;
+        };
+        let coverImg;
+        if (!parentItem.image) {
+            coverImg = coverPlaceholder();
+        } else {
+            coverImg = document.createElement('img');
+            coverImg.src = parentItem.image;
+            coverImg.style.width = '56px';
+            coverImg.style.height = '56px';
+            coverImg.style.borderRadius = '8px';
+            coverImg.style.objectFit = 'cover';
+            coverImg.style.flexShrink = '0';
+            coverImg.onerror = () => {
+                const ph = coverPlaceholder();
+                coverImg.replaceWith(ph);
+            };
+        }
 
         const headerText = document.createElement('div');
         headerText.style.flex = '1';
