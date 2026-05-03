@@ -17,10 +17,16 @@ class MassSearchCardEditor extends HTMLElement {
 
     set hass(hass) {
         this._hass = hass;
-        if (this._form) this._form.hass = hass;
+        this._render();
     }
 
     _schema() {
+        const maPlayers = this._hass
+            ? Object.entries(this._hass.states)
+                .filter(([id, state]) => id.startsWith('media_player.') && state.attributes.mass_player_type)
+                .map(([id, state]) => ({ value: id, label: state.attributes.friendly_name || id }))
+            : [];
+
         return [
             {
                 name: 'language',
@@ -39,7 +45,14 @@ class MassSearchCardEditor extends HTMLElement {
             },
             {
                 name: 'default_player',
-                selector: { entity: { domain: 'media_player' } },
+                selector: {
+                    select: {
+                        options: [
+                            { value: '', label: '— geen standaard —' },
+                            ...maPlayers,
+                        ],
+                    },
+                },
             },
             {
                 name: 'default_media_type',
@@ -386,10 +399,11 @@ class MassSearchCard extends HTMLElement {
         inputlimitresultsContainer.style.flexDirection = 'row';
         inputlimitresultsContainer.style.alignItems = 'center';
         inputlimitresultsContainer.style.border = '1px solid var(--primary-color)';
-        inputlimitresultsContainer.style.borderRadius = '24px'; // Ronde hoeken
+        inputlimitresultsContainer.style.borderRadius = '24px';
         inputlimitresultsContainer.style.backgroundColor = 'var(--card-background-color)';
         inputlimitresultsContainer.style.position = 'relative';
         inputlimitresultsContainer.style.height = '48.4px';
+        inputlimitresultsContainer.style.flex = '0 0 130px';
 
         // Invoerveld maximale resultaten
         const inputlimitresults = document.createElement('input');
