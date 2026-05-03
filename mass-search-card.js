@@ -1142,16 +1142,19 @@ class MassSearchCard extends HTMLElement {
                 option.style.alignItems = 'center';
                 option.style.gap = '8px';
 
-                const chk = document.createElement('input');
-                chk.type = 'checkbox';
-                chk.style.pointerEvents = 'none';
-                chk.checked = this.selectedMediaPlayers.includes(entity.entity_id);
-
                 const lbl = document.createElement('span');
                 lbl.textContent = entity.name;
 
                 option.dataset.entityId = entity.entity_id;
-                option.appendChild(chk);
+
+                if (this.config?.multiroom) {
+                    const chk = document.createElement('input');
+                    chk.type = 'checkbox';
+                    chk.style.pointerEvents = 'none';
+                    chk.checked = this.selectedMediaPlayers.includes(entity.entity_id);
+                    option.appendChild(chk);
+                }
+
                 option.appendChild(lbl);
 
                 option.addEventListener('click', () => {
@@ -1201,11 +1204,13 @@ class MassSearchCard extends HTMLElement {
             if (btn) updatePlayerButtonLabel(btn);
         }
 
-        // Sync checkboxes met huidige selectie
-        dropdownContent1.querySelectorAll('[data-entity-id]').forEach(opt => {
-            const chk = opt.querySelector('input[type="checkbox"]');
-            if (chk) chk.checked = this.selectedMediaPlayers.includes(opt.dataset.entityId);
-        });
+        // Sync checkboxes met huidige selectie (alleen bij multiroom)
+        if (this.config?.multiroom) {
+            dropdownContent1.querySelectorAll('[data-entity-id]').forEach(opt => {
+                const chk = opt.querySelector('input[type="checkbox"]');
+                if (chk) chk.checked = this.selectedMediaPlayers.includes(opt.dataset.entityId);
+            });
+        }
 
         // Controleer of er een shadowRoot is en pas de status door aan child-elementen
         if (this.shadowRoot) {
