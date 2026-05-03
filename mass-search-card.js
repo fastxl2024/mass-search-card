@@ -462,7 +462,7 @@ class MassSearchCard extends HTMLElement {
         inputlimitresultsContainer.style.backgroundColor = 'var(--card-background-color)';
         inputlimitresultsContainer.style.position = 'relative';
         inputlimitresultsContainer.style.height = '48.4px';
-        inputlimitresultsContainer.style.flex = '0 0 130px';
+        inputlimitresultsContainer.style.flex = '1 1 calc(50% - 6px)';
         if (this.config.default_results) inputlimitresultsContainer.style.display = 'none';
 
         // Invoerveld maximale resultaten
@@ -491,7 +491,8 @@ class MassSearchCard extends HTMLElement {
         checkboxContainer.style.borderRadius = '24px'; // Ronde hoeken
         checkboxContainer.style.backgroundColor = 'var(--card-background-color)';
         checkboxContainer.style.position = 'relative';
-        checkboxContainer.style.height = '48.4px';        
+        checkboxContainer.style.height = '48.4px';
+        checkboxContainer.style.flex = '1 1 calc(50% - 6px)';
 
         // Checkbox
         const checkbox = document.createElement('input');
@@ -517,6 +518,7 @@ class MassSearchCard extends HTMLElement {
         favoritesContainer.style.borderRadius = '24px';
         favoritesContainer.style.backgroundColor = 'var(--card-background-color)';
         favoritesContainer.style.height = '48.4px';
+        favoritesContainer.style.flex = '1 1 calc(50% - 6px)';
 
         const favoritesCheckbox = document.createElement('input');
         favoritesCheckbox.type = 'checkbox';
@@ -544,6 +546,7 @@ class MassSearchCard extends HTMLElement {
         sortContainer.style.backgroundColor = 'var(--card-background-color)';
         sortContainer.style.height = '48.4px';
         sortContainer.style.gap = '6px';
+        sortContainer.style.flex = '1 1 calc(50% - 6px)';
 
         const sortLabel = document.createElement('span');
         sortLabel.textContent = t.sort_label;
