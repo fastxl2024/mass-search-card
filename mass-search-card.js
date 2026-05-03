@@ -447,9 +447,8 @@ class MassSearchCard extends HTMLElement {
         inputContainer.appendChild(icon_searchbar);
 
         const searchsettingContainer = document.createElement('div');
-        searchsettingContainer.style.display = 'flex';
-        searchsettingContainer.style.flexWrap = 'wrap';
-        searchsettingContainer.style.alignItems = 'center';
+        searchsettingContainer.style.display = 'grid';
+        searchsettingContainer.style.gridTemplateColumns = '1fr 1fr';
         searchsettingContainer.style.gap = '12px';
 
         // Maak een eigen invoerveld voor maximale resultaten
@@ -462,7 +461,6 @@ class MassSearchCard extends HTMLElement {
         inputlimitresultsContainer.style.backgroundColor = 'var(--card-background-color)';
         inputlimitresultsContainer.style.position = 'relative';
         inputlimitresultsContainer.style.height = '48.4px';
-        inputlimitresultsContainer.style.flex = '1 1 calc(50% - 6px)';
         if (this.config.default_results) inputlimitresultsContainer.style.display = 'none';
 
         // Invoerveld maximale resultaten
@@ -520,13 +518,27 @@ class MassSearchCard extends HTMLElement {
         combinedCheckboxContainer.style.backgroundColor = 'var(--card-background-color)';
         combinedCheckboxContainer.style.height = '48.4px';
         combinedCheckboxContainer.style.padding = '0px 8px';
-        combinedCheckboxContainer.style.flex = '1 1 100%';
+        combinedCheckboxContainer.style.gridColumn = '1 / -1';
 
-        combinedCheckboxContainer.appendChild(checkbox);
-        combinedCheckboxContainer.appendChild(checkboxLabel);
+        const lokalGroup = document.createElement('div');
+        lokalGroup.style.display = 'flex';
+        lokalGroup.style.alignItems = 'center';
+        lokalGroup.style.justifyContent = 'center';
+        lokalGroup.style.flex = '1';
+        lokalGroup.appendChild(checkbox);
+        lokalGroup.appendChild(checkboxLabel);
+
+        const favoritenGroup = document.createElement('div');
+        favoritenGroup.style.display = 'flex';
+        favoritenGroup.style.alignItems = 'center';
+        favoritenGroup.style.justifyContent = 'center';
+        favoritenGroup.style.flex = '1';
+        favoritenGroup.appendChild(favoritesCheckbox);
+        favoritenGroup.appendChild(favoritesLabel);
+
+        combinedCheckboxContainer.appendChild(lokalGroup);
         combinedCheckboxContainer.appendChild(checkboxDivider);
-        combinedCheckboxContainer.appendChild(favoritesCheckbox);
-        combinedCheckboxContainer.appendChild(favoritesLabel);
+        combinedCheckboxContainer.appendChild(favoritenGroup);
 
         // Sortering dropdown
         const sortContainer = document.createElement('div');
@@ -538,7 +550,6 @@ class MassSearchCard extends HTMLElement {
         sortContainer.style.backgroundColor = 'var(--card-background-color)';
         sortContainer.style.height = '48.4px';
         sortContainer.style.gap = '6px';
-        sortContainer.style.flex = '1 1 calc(50% - 6px)';
 
         const sortLabel = document.createElement('span');
         sortLabel.textContent = t.sort_label;
