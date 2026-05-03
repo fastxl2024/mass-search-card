@@ -720,9 +720,9 @@ class MassSearchCard extends HTMLElement {
         const options = [
             { value: 'artist', label: t.artist_label },
             { value: 'track', label: t.track_label },
-            { value: 'album', label: 'Album' },
+            { value: 'album', label: t.album_label },
             { value: 'playlist', label: t.playlist_label },
-            { value: 'radio', label: 'Radio' },
+            { value: 'radio', label: t.radio_label },
         ];
         
         let selectedMediaType = ''; // Standaardwaarde
@@ -923,7 +923,7 @@ class MassSearchCard extends HTMLElement {
                 // For artists, albums, and radio, only display title and artist
                 textContainer.innerHTML = `
                     <div style="font-weight: bold;">${title}</div>
-                    <div style="font-size: 12px; color: #555;">${artistName || 'Unknown Artist'}</div>
+                    <div style="font-size: 12px; color: var(--secondary-text-color);">${artistName}</div>
                 `;
             } else if (isArtist) {
                 // For artists, albums, and radio, only display title and artist
@@ -934,8 +934,8 @@ class MassSearchCard extends HTMLElement {
                 // For tracks, display title, artist, and album
                 textContainer.innerHTML = `
                     <div style="font-weight: bold;">${title}</div>
-                    <div style="font-size: 12px; color: #555;">${artistName || 'Unknown Artist'}</div>
-                    <div style="font-size: 12px; color: #555;">${albumName || 'Unknown Album'}</div>
+                    <div style="font-size: 12px; color: var(--secondary-text-color);">${artistName}</div>
+                    <div style="font-size: 12px; color: var(--secondary-text-color);">${albumName}</div>
                 `;
             }
         
@@ -1038,7 +1038,7 @@ class MassSearchCard extends HTMLElement {
             
                 // For Tracks or Albums, handle the text and title accordingly
                 const title = mediaItem.name || 'Unknown Title';
-                const artistName = mediaItem.artists?.[0]?.name || (isRadio ? 'Radio Station' : isPlaylist ? 'Playlist' : 'Unknown Artist'); // Default for radio
+                const artistName = mediaItem.artists?.[0]?.name || (isRadio ? t.radio_label : isPlaylist ? t.playlist_label : t.unknown_artist);
                 const albumName = isTrack ? mediaItem.album?.name || '' : ''; // Only for tracks
             
                 const textContainer = createTextContainer(title, artistName, albumName, isArtist, isTrack, isAlbum, isRadio, isPlaylist);
