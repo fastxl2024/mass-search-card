@@ -942,7 +942,7 @@ class MassSearchCard extends HTMLElement {
             return textContainer;
         }
 
-        function createIconContainer(uri) {
+        function createIconContainer(uri, showEye = false) {
             const iconContainer = document.createElement('div');
             iconContainer.style.flex = '0 0 80px';
             iconContainer.style.display = 'flex';
@@ -980,11 +980,21 @@ class MassSearchCard extends HTMLElement {
                 icon.style.marginRight = '4px';
                 iconContainer.appendChild(icon);
             });
-        
-            if (icons.length === 1) {
+
+            if (showEye) {
+                const eyeEl = document.createElement('span');
+                eyeEl.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="var(--primary-color)" style="display:block;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`;
+                eyeEl.style.display = 'flex';
+                eyeEl.style.alignItems = 'center';
+                eyeEl.style.marginLeft = '4px';
+                eyeEl.style.marginRight = '4px';
+                iconContainer.insertBefore(eyeEl, iconContainer.firstChild);
+            }
+
+            if (icons.length === 0 && !showEye) {
                 iconContainer.style.justifyContent = 'flex-end';
             }
-        
+
             return iconContainer;
         }
 
@@ -1044,7 +1054,7 @@ class MassSearchCard extends HTMLElement {
                 const textContainer = createTextContainer(title, artistName, albumName, isArtist, isTrack, isAlbum, isRadio, isPlaylist);
             
                 // Create icon container
-                const iconContainer = createIconContainer(mediaItem.uri);
+                const iconContainer = createIconContainer(mediaItem.uri, isAlbum || isPlaylist);
             
                 // Append all containers to the button
                 button.appendChild(imageContainer);
