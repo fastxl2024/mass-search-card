@@ -142,6 +142,9 @@ class MassSearchCard extends HTMLElement {
               max-width: 95vw !important;
             }
           }
+          @keyframes mass-spin {
+            to { transform: rotate(360deg); }
+          }
         `;
         
         // Stijl wordt pas aan shadowRoot toegevoegd na de innerHTML-reset verderop
@@ -808,6 +811,48 @@ class MassSearchCard extends HTMLElement {
         document.addEventListener('click', this._closeDropdowns);
     }
 
+    async _playWithAnimation(btn, action) {
+        // 1. Scale-down: directe tactiele feedback
+        btn.style.transition = 'transform 0.1s ease';
+        btn.style.transform = 'scale(0.95)';
+        btn.disabled = true;
+        const prevPosition = btn.style.position;
+        const prevOverflow = btn.style.overflow;
+        btn.style.position = 'relative';
+        btn.style.overflow = 'hidden';
+
+        await new Promise(r => setTimeout(r, 100));
+        btn.style.transform = 'scale(1)';
+
+        // 2. Spinner overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.18);border-radius:inherit;';
+
+        const spinner = document.createElement('span');
+        spinner.style.cssText = 'display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.9);border-top-color:transparent;border-radius:50%;animation:mass-spin 0.6s linear infinite;';
+        overlay.appendChild(spinner);
+        btn.appendChild(overlay);
+
+        // 3. Actie uitvoeren
+        try { await action(); } catch (e) { console.error(e); }
+
+        // 4. Vinkje
+        overlay.innerHTML = '';
+        const check = document.createElement('span');
+        check.textContent = '✓';
+        check.style.cssText = 'font-size:20px;font-weight:bold;color:white;line-height:1;';
+        overlay.appendChild(check);
+
+        await new Promise(r => setTimeout(r, 800));
+
+        // 5. Herstel
+        btn.removeChild(overlay);
+        btn.disabled = false;
+        btn.style.position = prevPosition;
+        btn.style.overflow = prevOverflow;
+        btn.style.transition = '';
+    }
+
     showPopup(response, title, t, mediaType, favoritesOnly = false, mediaPlayers = [], selectedSort = 'default') {
         // Maak een popup-container
         const popupContainer = document.createElement('div');
@@ -1006,12 +1051,12 @@ class MassSearchCard extends HTMLElement {
                 button.appendChild(textContainer);
                 button.appendChild(iconContainer);
             
-                button.addEventListener('click', async () => {
+                button.addEventListener('click', () => {
                     if (isAlbum || isPlaylist) {
                         this.showTracklist(mediaItem, t, mediaPlayers);
                         return;
                     }
-                    try {
+                    this._playWithAnimation(button, async () => {
                         for (const playerId of mediaPlayers) {
                             await this.hass.callService('music_assistant', 'play_media', {
                                 entity_id: playerId,
@@ -1019,9 +1064,7 @@ class MassSearchCard extends HTMLElement {
                                 media_id: mediaItem.uri,
                             });
                         }
-                    } catch (error) {
-                        console.error(`${t.error_fetching}:`, error);
-                    }
+                    });
                 });
             
                 popup.appendChild(button);
@@ -1133,9 +1176,9 @@ class MassSearchCard extends HTMLElement {
         playAllBtn.style.cursor = 'pointer';
         playAllBtn.style.fontWeight = 'bold';
         playAllBtn.style.alignSelf = 'flex-start';
-        playAllBtn.addEventListener('click', async () => {
+        playAllBtn.addEventListener('click', () => {
             const contentType = parentItem.uri.includes('playlist') ? 'playlist' : 'album';
-            try {
+            this._playWithAnimation(playAllBtn, async () => {
                 for (const playerId of mediaPlayers) {
                     await this.hass.callService('music_assistant', 'play_media', {
                         entity_id: playerId,
@@ -1143,9 +1186,7 @@ class MassSearchCard extends HTMLElement {
                         media_id: parentItem.uri,
                     });
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            });
         });
         panel.appendChild(playAllBtn);
 
@@ -1219,8 +1260,8 @@ class MassSearchCard extends HTMLElement {
                 trackRow.addEventListener('mouseover', () => { trackRow.style.backgroundColor = 'orange'; trackRow.style.color = 'white'; });
                 trackRow.addEventListener('mouseout', () => { trackRow.style.backgroundColor = 'var(--card-background-color)'; trackRow.style.color = 'var(--primary-text-color)'; });
 
-                trackRow.addEventListener('click', async () => {
-                    try {
+                trackRow.addEventListener('click', () => {
+                    this._playWithAnimation(trackRow, async () => {
                         for (const playerId of mediaPlayers) {
                             await this.hass.callService('music_assistant', 'play_media', {
                                 entity_id: playerId,
@@ -1228,9 +1269,7 @@ class MassSearchCard extends HTMLElement {
                                 media_id: track.media_content_id,
                             });
                         }
-                    } catch (err) {
-                        console.error(err);
-                    }
+                    });
                 });
 
                 panel.insertBefore(trackRow, closeBtn);
