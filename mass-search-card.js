@@ -479,62 +479,54 @@ class MassSearchCard extends HTMLElement {
         inputlimitresults.style.borderRadius = '12px';
         inputlimitresultsContainer.appendChild(inputlimitresults);
 
-        // Checkbox container
-        const checkboxContainer = document.createElement('div');
-        checkboxContainer.style.display = 'flex';
-        checkboxContainer.style.alignItems = 'center';
-        checkboxContainer.style.marginRight = '0px';
-        checkboxContainer.style.padding= '0px 16px';
-        checkboxContainer.style.flexDirection = 'row';
-        checkboxContainer.style.alignItems = 'center';
-        checkboxContainer.style.border = '1px solid var(--primary-color)';
-        checkboxContainer.style.borderRadius = '24px'; // Ronde hoeken
-        checkboxContainer.style.backgroundColor = 'var(--card-background-color)';
-        checkboxContainer.style.position = 'relative';
-        checkboxContainer.style.height = '48.4px';
-        checkboxContainer.style.flex = '1 1 calc(50% - 6px)';
-
-        // Checkbox
+        // Checkbox (lokaal)
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.style.margin = '0 2px';
-        checkboxContainer.appendChild(checkbox);
 
-        // Checkbox label
         const checkboxLabel = document.createElement('label');
         checkboxLabel.textContent = t.library_only_label;
         checkboxLabel.style.color = 'var(--primary-text-color)';
         checkboxLabel.style.fontSize = '14px';
         checkboxLabel.style.padding = '8px';
-        checkboxContainer.appendChild(checkboxLabel);
+        checkboxLabel.style.cursor = 'pointer';
 
-        // Favorieten-checkbox container
-        const favoritesContainer = document.createElement('div');
-        favoritesContainer.style.display = 'flex';
-        favoritesContainer.style.alignItems = 'center';
-        favoritesContainer.style.padding = '0px 16px';
-        favoritesContainer.style.flexDirection = 'row';
-        favoritesContainer.style.border = '1px solid var(--primary-color)';
-        favoritesContainer.style.borderRadius = '24px';
-        favoritesContainer.style.backgroundColor = 'var(--card-background-color)';
-        favoritesContainer.style.height = '48.4px';
-        favoritesContainer.style.flex = '1 1 calc(50% - 6px)';
-
+        // Checkbox (favorieten)
         const favoritesCheckbox = document.createElement('input');
         favoritesCheckbox.type = 'checkbox';
         favoritesCheckbox.style.margin = '0 2px';
-        favoritesContainer.appendChild(favoritesCheckbox);
 
         const favoritesLabel = document.createElement('label');
         favoritesLabel.textContent = t.favorites_only_label;
         favoritesLabel.style.color = 'var(--primary-text-color)';
         favoritesLabel.style.fontSize = '14px';
         favoritesLabel.style.padding = '8px';
-        favoritesContainer.appendChild(favoritesLabel);
+        favoritesLabel.style.cursor = 'pointer';
 
-        searchsettingContainer.appendChild(inputlimitresultsContainer);
-        searchsettingContainer.appendChild(checkboxContainer);
-        searchsettingContainer.appendChild(favoritesContainer);
+        // Scheidingslijn tussen de twee checkboxes
+        const checkboxDivider = document.createElement('span');
+        checkboxDivider.style.width = '1px';
+        checkboxDivider.style.alignSelf = 'stretch';
+        checkboxDivider.style.backgroundColor = 'var(--primary-color)';
+        checkboxDivider.style.margin = '8px 4px';
+
+        // Gecombineerde checkbox-container (zelfde stijl als de speler/mediatype balk)
+        const combinedCheckboxContainer = document.createElement('div');
+        combinedCheckboxContainer.style.display = 'flex';
+        combinedCheckboxContainer.style.alignItems = 'center';
+        combinedCheckboxContainer.style.flexDirection = 'row';
+        combinedCheckboxContainer.style.border = '1px solid var(--primary-color)';
+        combinedCheckboxContainer.style.borderRadius = '24px';
+        combinedCheckboxContainer.style.backgroundColor = 'var(--card-background-color)';
+        combinedCheckboxContainer.style.height = '48.4px';
+        combinedCheckboxContainer.style.padding = '0px 8px';
+        combinedCheckboxContainer.style.flex = '1 1 100%';
+
+        combinedCheckboxContainer.appendChild(checkbox);
+        combinedCheckboxContainer.appendChild(checkboxLabel);
+        combinedCheckboxContainer.appendChild(checkboxDivider);
+        combinedCheckboxContainer.appendChild(favoritesCheckbox);
+        combinedCheckboxContainer.appendChild(favoritesLabel);
 
         // Sortering dropdown
         const sortContainer = document.createElement('div');
@@ -561,6 +553,7 @@ class MassSearchCard extends HTMLElement {
         sortSelect.style.color = 'var(--primary-text-color)';
         sortSelect.style.fontSize = '14px';
         sortSelect.style.cursor = 'pointer';
+        sortSelect.style.flex = '1';
 
         [
             { value: 'default', label: t.sort_default },
@@ -575,7 +568,12 @@ class MassSearchCard extends HTMLElement {
 
         sortContainer.appendChild(sortLabel);
         sortContainer.appendChild(sortSelect);
+
+        // Rij 1: aantal resultaten + sortering
+        searchsettingContainer.appendChild(inputlimitresultsContainer);
         searchsettingContainer.appendChild(sortContainer);
+        // Rij 2: gecombineerde checkboxes (volledige breedte)
+        searchsettingContainer.appendChild(combinedCheckboxContainer);
 
         // ha-card als wrapper zodat card-mod stijlen kan injecteren
         const wrapper = document.createElement('ha-card');
