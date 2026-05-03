@@ -429,6 +429,7 @@ class MassSearchCard extends HTMLElement {
 
         // Maak de dropdown-knop
         const dropdownButton1 = document.createElement('button');
+        dropdownButton1.id = 'mass-search-player-btn';
         dropdownButton1.textContent = t.dropdown_label_media_player;
         dropdownButton1.style.width = '100%';
         dropdownButton1.style.border = '1px solid var(--primary-color)';
@@ -545,6 +546,7 @@ class MassSearchCard extends HTMLElement {
             // Klik-event voor het selecteren van een optie
             dropdownOption.addEventListener('click', () => {
                 selectedMediaType = option.value; // Stel de waarde in
+                localStorage.setItem('mass-search-card-media-type', option.value);
                 dropdownButton2.textContent = option.label; // Toon label in de knop
                 dropdownButton2.appendChild(dropdownIcon2); // Re-add icon after changing text
                 dropdownContent2.style.display = 'none'; // Verberg de dropdown
@@ -560,7 +562,18 @@ class MassSearchCard extends HTMLElement {
             
             dropdownContent2.appendChild(dropdownOption);
         });
-        
+
+        // Pre-selecteer op basis van config of localStorage
+        const savedMediaType = this.config?.default_media_type || localStorage.getItem('mass-search-card-media-type');
+        if (savedMediaType) {
+            const match = options.find(o => o.value === savedMediaType);
+            if (match) {
+                selectedMediaType = match.value;
+                dropdownButton2.textContent = match.label;
+                dropdownButton2.appendChild(dropdownIcon2);
+            }
+        }
+
         // Klik-event voor de dropdown-knop
         dropdownButton2.addEventListener('click', () => {
             dropdownContent2.style.display = dropdownContent2.style.display === 'none' ? 'block' : 'none';
@@ -857,24 +870,22 @@ class MassSearchCard extends HTMLElement {
                 option.style.cursor = 'pointer';
                 option.style.borderBottom = '1px solid var(--divider-color)';
                 option.addEventListener('click', () => {
-                    const dropdownButton1 = this.shadowRoot.querySelector('div > button');
+                    const dropdownButton1 = this.shadowRoot.querySelector('#mass-search-player-btn');
 
                     // Update selected media player directly
-                    this.selectedMediaPlayer = entity.entity_id; // Directly set the selected media player
-
-                    // Log the selected entity to the console
-                    console.log('Selected entity:', entity);
+                    this.selectedMediaPlayer = entity.entity_id;
+                    localStorage.setItem('mass-search-card-player', entity.entity_id);
 
                     dropdownButton1.textContent = entity.name;
 
                     // Voeg het icoontje opnieuw toe
                     const dropdownIcon = document.createElement('span');
-                    dropdownIcon.textContent = '▼'; // Unicode voor het pijltje
-                    dropdownIcon.style.marginLeft = 'auto'; // Zorgt dat het icoontje aan de rechterkant staat
+                    dropdownIcon.textContent = '▼';
+                    dropdownIcon.style.marginLeft = 'auto';
                     dropdownIcon.style.fontSize = '12px';
-                    dropdownIcon.style.pointerEvents = 'none'; // Voorkomt dat het icoontje klikbaar is
+                    dropdownIcon.style.pointerEvents = 'none';
 
-                    dropdownButton1.appendChild(dropdownIcon); // Voeg het icoontje opnieuw toe aan de knop
+                    dropdownButton1.appendChild(dropdownIcon);
                     dropdownContent1.style.display = 'none';
                 });
                 dropdownContent1.appendChild(option);
@@ -885,6 +896,27 @@ class MassSearchCard extends HTMLElement {
             noOption.style.padding = '8px';
             noOption.style.color = 'var(--disabled-text-color)';
             dropdownContent1.appendChild(noOption);
+        }
+
+        // Pre-selecteer speler op basis van config of localStorage (alleen als nog niet geselecteerd)
+        if (!this.selectedMediaPlayer) {
+            const savedPlayer = this.config?.default_player || localStorage.getItem('mass-search-card-player');
+            if (savedPlayer) {
+                const match = this.mediaPlayerEntities.find(e => e.entity_id === savedPlayer);
+                if (match) {
+                    this.selectedMediaPlayer = match.entity_id;
+                    const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
+                    if (btn) {
+                        btn.textContent = match.name;
+                        const icon = document.createElement('span');
+                        icon.textContent = '▼';
+                        icon.style.marginLeft = 'auto';
+                        icon.style.fontSize = '12px';
+                        icon.style.pointerEvents = 'none';
+                        btn.appendChild(icon);
+                    }
+                }
+            }
         }
 
         // Controleer of er een shadowRoot is en pas de status door aan child-elementen

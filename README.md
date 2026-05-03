@@ -47,7 +47,10 @@ Click on the magnifying glass in the input bar to search for your item, after yo
    ````yaml
       language: Set the language of the card. Supported languages: cz, en, nl, sv, sk, fr.
       Default: en
+      default_player: Lock a default media player (entity_id, e.g. media_player.living_room).
+      default_media_type: Lock a default media type (track, album, artist, playlist, radio).
    ````
+   The last used player and media type are automatically remembered via localStorage. Use `default_player` and `default_media_type` in the card config to pin a fixed default that overrides the remembered selection.
 
 **Feel free to add some languages!**
 
