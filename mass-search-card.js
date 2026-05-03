@@ -4,7 +4,92 @@
  * @description Search and play media using Music Assistant in Home Assistant
  */
 
+class MassSearchCardEditor extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
+
+    setConfig(config) {
+        this._config = config;
+        this._render();
+    }
+
+    set hass(hass) {
+        this._hass = hass;
+        if (this._form) this._form.hass = hass;
+    }
+
+    _schema() {
+        return [
+            {
+                name: 'language',
+                selector: {
+                    select: {
+                        options: [
+                            { value: 'en', label: 'English' },
+                            { value: 'nl', label: 'Nederlands' },
+                            { value: 'cz', label: 'Čeština' },
+                            { value: 'sv', label: 'Svenska' },
+                            { value: 'sk', label: 'Slovenčina' },
+                            { value: 'fr', label: 'Français' },
+                        ],
+                    },
+                },
+            },
+            {
+                name: 'default_player',
+                selector: { entity: { domain: 'media_player' } },
+            },
+            {
+                name: 'default_media_type',
+                selector: {
+                    select: {
+                        options: [
+                            { value: '', label: '— geen standaard —' },
+                            { value: 'track', label: 'Nummer' },
+                            { value: 'album', label: 'Album' },
+                            { value: 'artist', label: 'Artiest' },
+                            { value: 'playlist', label: 'Afspeellijst' },
+                            { value: 'radio', label: 'Radio' },
+                        ],
+                    },
+                },
+            },
+        ];
+    }
+
+    _render() {
+        if (!this._config) return;
+        const form = document.createElement('ha-form');
+        form.hass = this._hass;
+        form.data = this._config;
+        form.schema = this._schema();
+        form.computeLabel = (s) =>
+            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type' }[s.name] || s.name);
+        form.addEventListener('value-changed', (e) => {
+            this.dispatchEvent(new CustomEvent('config-changed', {
+                detail: { config: e.detail.value },
+                bubbles: true,
+                composed: true,
+            }));
+        });
+        this.shadowRoot.innerHTML = '';
+        this.shadowRoot.appendChild(form);
+        this._form = form;
+    }
+}
+customElements.define('mass-search-card-editor', MassSearchCardEditor);
+
 class MassSearchCard extends HTMLElement {
+    static getConfigElement() {
+        return document.createElement('mass-search-card-editor');
+    }
+
+    static getStubConfig() {
+        return { language: 'en' };
+    }
+
     async setConfig(config) {
         this.config = config;
 
