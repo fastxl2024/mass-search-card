@@ -709,13 +709,17 @@ class MassSearchCard extends HTMLElement {
         this.shadowRoot.appendChild(style);  // Stijl opnieuw toevoegen na de reset
         this.shadowRoot.appendChild(wrapper);
 
+        // Klikken binnen de dropdowns mogen niet naar document bubbelen
+        dropdown1.addEventListener('click', (e) => e.stopPropagation());
+        dropdown2.addEventListener('click', (e) => e.stopPropagation());
+
         // Sluit dropdowns bij klik buiten de kaart (cleanup oude handler bij herinitialisatie)
-        if (this._closeDropdowns) document.removeEventListener('click', this._closeDropdowns, true);
+        if (this._closeDropdowns) document.removeEventListener('click', this._closeDropdowns);
         this._closeDropdowns = () => {
             dropdownContent1.style.display = 'none';
             dropdownContent2.style.display = 'none';
         };
-        document.addEventListener('click', this._closeDropdowns, true);
+        document.addEventListener('click', this._closeDropdowns);
     }
 
     showPopup(response, title, t, mediaType, favoritesOnly = false) {
