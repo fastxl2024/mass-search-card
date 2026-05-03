@@ -16,11 +16,9 @@ The **Mass Search Card** is a custom Lovelace card for Home Assistant that lets 
 
 ## Screenshots
 
-> _Add screenshots here by uploading images to GitHub and replacing the placeholder URLs below._
-
 | Search card | Search results |
 |:-----------:|:--------------:|
-| ![Search card](https://github.com/user-attachments/assets/25025169-a99e-4536-b930-e7b71fbe40a9) | ![Search results](https://github.com/user-attachments/assets/ce10cadf-bada-444a-87ea-a9d05f0a41db) |
+| ![Search card](images/search-card.png) | _coming soon_ |
 
 ## Installation
 
