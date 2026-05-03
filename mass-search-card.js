@@ -17,17 +17,9 @@ class MassSearchCard extends HTMLElement {
         const style = document.createElement('style');
         style.textContent = `
           @media (max-width: 600px) {
-            .dropdown-button, .input-container, .button-container {
-              width: 100%; /* Allow full width for smaller screens */
-            }
             .popup {
-              max-width: 90vw; /* Scale down the popup for mobile */
-            }
-            .icon {
-              font-size: 20px; /* Reduce icon size */
-            }
-            .button {
-              font-size: 14px; /* Adjust font size for better readability */
+              width: 95vw !important;
+              max-width: 95vw !important;
             }
           }
         `;
@@ -291,6 +283,7 @@ class MassSearchCard extends HTMLElement {
 
         const searchsettingContainer = document.createElement('div');
         searchsettingContainer.style.display = 'flex';
+        searchsettingContainer.style.flexWrap = 'wrap';
         searchsettingContainer.style.alignItems = 'center';
         searchsettingContainer.style.gap = '12px';
 
@@ -383,6 +376,7 @@ class MassSearchCard extends HTMLElement {
         // Maak een knop met twee dropdowns en een icoon
         const buttonContainer = document.createElement('div');
         buttonContainer.style.display = 'flex';
+        buttonContainer.style.flexWrap = 'wrap';
         buttonContainer.style.alignItems = 'center';
         buttonContainer.style.gap = '8px';
         buttonContainer.style.padding = '8px';
@@ -399,11 +393,12 @@ class MassSearchCard extends HTMLElement {
         const dropdown1 = document.createElement('div');
         dropdown1.style.position = 'relative';
         dropdown1.style.flex = '1';
-            
+        dropdown1.style.minWidth = '0';
+
         // Maak de dropdown-knop
         const dropdownButton1 = document.createElement('button');
         dropdownButton1.textContent = t.dropdown_label_media_player;
-        dropdownButton1.style.width = '225px';
+        dropdownButton1.style.width = '100%';
         dropdownButton1.style.border = '1px solid var(--primary-color)';
         dropdownButton1.style.borderRadius = '8px';
         dropdownButton1.style.padding = '8px';
@@ -434,7 +429,7 @@ class MassSearchCard extends HTMLElement {
         dropdownContent1.style.position = 'absolute';
         dropdownContent1.style.top = '100%';
         dropdownContent1.style.left = '0';
-        dropdownContent1.style.width = '225px';
+        dropdownContent1.style.width = '100%';
         dropdownContent1.style.border = '1px solid var(--primary-color)';
         dropdownContent1.style.borderRadius = '8px';
         dropdownContent1.style.backgroundColor = 'var(--card-background-color)';
@@ -454,12 +449,13 @@ class MassSearchCard extends HTMLElement {
         // Maak de dropdown container
         const dropdown2 = document.createElement('div');
         dropdown2.style.position = 'relative';
-        dropdown2.style.flex = '1';
+        dropdown2.style.flex = '0 0 auto';
+        dropdown2.style.minWidth = '120px';
 
         // Maak de dropdown-knop
         const dropdownButton2 = document.createElement('button');
         dropdownButton2.textContent = t.media_type;
-        dropdownButton2.style.width = '120px'; // Breder voor langere labels
+        dropdownButton2.style.width = '100%';
         dropdownButton2.style.border = '1px solid var(--primary-color)';
         dropdownButton2.style.borderRadius = '8px';
         dropdownButton2.style.padding = '8px';
@@ -490,7 +486,7 @@ class MassSearchCard extends HTMLElement {
         dropdownContent2.style.position = 'absolute';
         dropdownContent2.style.top = '100%';
         dropdownContent2.style.left = '0';
-        dropdownContent2.style.width = '100px';
+        dropdownContent2.style.width = '100%';
         dropdownContent2.style.border = '1px solid var(--primary-color)';
         dropdownContent2.style.borderRadius = '8px';
         dropdownContent2.style.backgroundColor = 'var(--card-background-color)';
@@ -579,6 +575,7 @@ class MassSearchCard extends HTMLElement {
     
         // Maak een popup-venster
         const popup = document.createElement('div');
+        popup.classList.add('popup');
         popup.style.backgroundColor = 'var(--card-background-color)';
         popup.style.borderRadius = '24px';
         popup.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
