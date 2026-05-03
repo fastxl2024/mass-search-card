@@ -75,6 +75,10 @@ class MassSearchCardEditor extends HTMLElement {
                     },
                 },
             },
+            {
+                name: 'compact',
+                selector: { boolean: {} },
+            },
         ];
     }
 
@@ -85,7 +89,7 @@ class MassSearchCardEditor extends HTMLElement {
         form.data = this._config;
         form.schema = this._schema();
         form.computeLabel = (s) =>
-            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type' }[s.name] || s.name);
+            ({ language: 'Taal', default_player: 'Standaard speler', default_media_type: 'Standaard media type', compact: 'Compacte weergave' }[s.name] || s.name);
         form.addEventListener('value-changed', (e) => {
             this.dispatchEvent(new CustomEvent('config-changed', {
                 detail: { config: e.detail.value },
@@ -153,6 +157,11 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Nummer',
                 unknown_artist: 'Onbekende artiest',
                 unknown_duration: 'Onbekende duur',
+                sort_label: 'Sortering',
+                sort_default: 'Standaard',
+                sort_name: 'Naam (A-Z)',
+                sort_artist: 'Artiest (A-Z)',
+                players_selected: '{n} spelers',
             },
             cs: {
                 album_label: 'Album',
@@ -176,6 +185,11 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Skladba',
                 unknown_artist: 'Neznámý umělec',
                 unknown_duration: 'Neznámá délka',
+                sort_label: 'Řazení',
+                sort_default: 'Výchozí',
+                sort_name: 'Název (A-Z)',
+                sort_artist: 'Umělec (A-Z)',
+                players_selected: '{n} přehrávačů',
             },
             en: {
                 album_label: 'Album',
@@ -199,6 +213,11 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Track',
                 unknown_artist: 'Unknown artist',
                 unknown_duration: 'Unknown duration',
+                sort_label: 'Sort',
+                sort_default: 'Default',
+                sort_name: 'Name (A-Z)',
+                sort_artist: 'Artist (A-Z)',
+                players_selected: '{n} players',
             },
             sv: {
                 album_label: 'Album',
@@ -222,6 +241,11 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Spår',
                 unknown_artist: 'Okänd artist',
                 unknown_duration: 'Okänd varaktighet',
+                sort_label: 'Sortering',
+                sort_default: 'Standard',
+                sort_name: 'Namn (A-Ö)',
+                sort_artist: 'Artist (A-Ö)',
+                players_selected: '{n} spelare',
             },
             cz: {
                 album_label: 'Album',
@@ -244,7 +268,12 @@ class MassSearchCard extends HTMLElement {
                 title_text: 'Hledat v Music Assistant',
                 track_label: 'Skladba',
                 unknown_artist: 'Neznámý umělec',
-                unknown_duration: 'Neznámá délka',                
+                unknown_duration: 'Neznámá délka',
+                sort_label: 'Řazení',
+                sort_default: 'Výchozí',
+                sort_name: 'Název (A-Z)',
+                sort_artist: 'Umělec (A-Z)',
+                players_selected: '{n} přehrávačů',
             },
             fr: {
                 album_label: 'Album',
@@ -268,6 +297,11 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Morceau',
                 unknown_artist: 'Artiste inconnu',
                 unknown_duration: 'Durée inconnue',
+                sort_label: 'Tri',
+                sort_default: 'Par défaut',
+                sort_name: 'Nom (A-Z)',
+                sort_artist: 'Artiste (A-Z)',
+                players_selected: '{n} lecteurs',
             },
             sk: {
                 album_label: 'Album',
@@ -291,12 +325,18 @@ class MassSearchCard extends HTMLElement {
                 track_label: 'Skladba',
                 unknown_artist: 'Neznámy umelec',
                 unknown_duration: 'Neznáma dĺžka',
+                sort_label: 'Zoradiť',
+                sort_default: 'Predvolené',
+                sort_name: 'Názov (A-Z)',
+                sort_artist: 'Umelec (A-Z)',
+                players_selected: '{n} prehrávačov',
             }
           };
       
           const language = this.config.language || this.hass?.language || 'en';
           const t = translations[language] || translations.en;
-          this.selectedMediaPlayer = null;
+          this._t = t;
+          this.selectedMediaPlayers = this.selectedMediaPlayers || [];
           this.configEntryId = '';
   
         // Maak een eigen invoerveld
@@ -333,12 +373,13 @@ class MassSearchCard extends HTMLElement {
             if (this.hass) {
                 const query = input.value.trim();
                 const mediaType = selectedMediaType; // Geselecteerde waarde van de dropdown
-                const mediaPlayer = this.selectedMediaPlayer;
+                const mediaPlayers = this.selectedMediaPlayers;
                 const configEntryId = this.configEntryId;
                 const limit = parseInt(inputlimitresults.value, 10) || 8;
                 const libraryOnly = checkbox.checked;
                 const favoritesOnly = favoritesCheckbox.checked;
-        
+                const selectedSort = sortSelect.value;
+
                 const message = {
                     type: 'call_service',
                     domain: 'music_assistant',
@@ -352,7 +393,7 @@ class MassSearchCard extends HTMLElement {
                     },
                     return_response: true,
                 };
-                if (!mediaPlayer) {
+                if (!mediaPlayers || !mediaPlayers.length) {
                     alert(t.dropdown_label_media_player);
                     return;
                 }
@@ -374,7 +415,7 @@ class MassSearchCard extends HTMLElement {
                         } else {
                             title = `${t.popup_title} "${query}" (${mediaType})`;
                         }
-                        this.showPopup(response, title, t, mediaType, favoritesOnly);
+                        this.showPopup(response, title, t, mediaType, favoritesOnly, mediaPlayers, selectedSort);
                     }
                 } catch (error) {
                     console.error('Error during service call:', error);
@@ -479,6 +520,46 @@ class MassSearchCard extends HTMLElement {
         searchsettingContainer.appendChild(inputlimitresultsContainer);
         searchsettingContainer.appendChild(checkboxContainer);
         searchsettingContainer.appendChild(favoritesContainer);
+
+        // Sortering dropdown
+        const sortContainer = document.createElement('div');
+        sortContainer.style.display = 'flex';
+        sortContainer.style.alignItems = 'center';
+        sortContainer.style.padding = '0px 12px';
+        sortContainer.style.border = '1px solid var(--primary-color)';
+        sortContainer.style.borderRadius = '24px';
+        sortContainer.style.backgroundColor = 'var(--card-background-color)';
+        sortContainer.style.height = '48.4px';
+        sortContainer.style.gap = '6px';
+
+        const sortLabel = document.createElement('span');
+        sortLabel.textContent = t.sort_label;
+        sortLabel.style.color = 'var(--primary-text-color)';
+        sortLabel.style.fontSize = '14px';
+        sortLabel.style.whiteSpace = 'nowrap';
+
+        const sortSelect = document.createElement('select');
+        sortSelect.style.border = 'none';
+        sortSelect.style.outline = 'none';
+        sortSelect.style.background = 'transparent';
+        sortSelect.style.color = 'var(--primary-text-color)';
+        sortSelect.style.fontSize = '14px';
+        sortSelect.style.cursor = 'pointer';
+
+        [
+            { value: 'default', label: t.sort_default },
+            { value: 'name', label: t.sort_name },
+            { value: 'artist', label: t.sort_artist },
+        ].forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt.value;
+            o.textContent = opt.label;
+            sortSelect.appendChild(o);
+        });
+
+        sortContainer.appendChild(sortLabel);
+        sortContainer.appendChild(sortSelect);
+        searchsettingContainer.appendChild(sortContainer);
 
         // ha-card als wrapper zodat card-mod stijlen kan injecteren
         const wrapper = document.createElement('ha-card');
@@ -703,10 +784,12 @@ class MassSearchCard extends HTMLElement {
         buttonContainer.appendChild(dropdown2);
         wrapper.appendChild(buttonContainer);
 
+        const compact = this.config.compact === true;
+
         // Voeg de kaarten en invoer toe aan de wrapper
-        wrapper.appendChild(titleContainer);    
+        if (!compact) wrapper.appendChild(titleContainer);
         wrapper.appendChild(inputContainer);
-        wrapper.appendChild(searchsettingContainer);
+        if (!compact) wrapper.appendChild(searchsettingContainer);
         wrapper.appendChild(buttonContainer);
 
         // Voeg de wrapper toe aan de shadow DOM
@@ -727,7 +810,7 @@ class MassSearchCard extends HTMLElement {
         document.addEventListener('click', this._closeDropdowns);
     }
 
-    showPopup(response, title, t, mediaType, favoritesOnly = false) {
+    showPopup(response, title, t, mediaType, favoritesOnly = false, mediaPlayers = [], selectedSort = 'default') {
         // Maak een popup-container
         const popupContainer = document.createElement('div');
         popupContainer.style.position = 'fixed';
@@ -875,7 +958,17 @@ class MassSearchCard extends HTMLElement {
             if (favoritesOnly) {
                 mediaItems = mediaItems.filter(item => item.favorite === true);
             }
-        
+
+            if (selectedSort === 'name') {
+                mediaItems.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            } else if (selectedSort === 'artist') {
+                mediaItems.sort((a, b) => {
+                    const aA = a.artists?.[0]?.name || a.name || '';
+                    const bA = b.artists?.[0]?.name || b.name || '';
+                    return aA.localeCompare(bA);
+                });
+            }
+
             mediaItems.forEach(async (mediaItem) => {
                 const button = document.createElement('button');
                 button.style.display = 'flex';
@@ -917,11 +1010,13 @@ class MassSearchCard extends HTMLElement {
             
                 button.addEventListener('click', async () => {
                     try {
-                        await this.hass.callService('music_assistant', 'play_media', {
-                            entity_id: this.selectedMediaPlayer,
-                            media_type: mediaType,
-                            media_id: mediaItem.uri,
-                        });
+                        for (const playerId of mediaPlayers) {
+                            await this.hass.callService('music_assistant', 'play_media', {
+                                entity_id: playerId,
+                                media_type: mediaType,
+                                media_id: mediaItem.uri,
+                            });
+                        }
                     } catch (error) {
                         console.error(`${t.error_fetching}:`, error);
                     }
@@ -987,32 +1082,61 @@ class MassSearchCard extends HTMLElement {
 
         dropdownContent1.innerHTML = '';
 
+        const t_hass = this._t || { dropdown_label_media_player: 'Selecteer een media player', players_selected: '{n} spelers' };
+
+        const updatePlayerButtonLabel = (btn) => {
+            const count = this.selectedMediaPlayers.length;
+            btn.textContent = count === 0
+                ? t_hass.dropdown_label_media_player
+                : count === 1
+                    ? (this.mediaPlayerEntities.find(e => e.entity_id === this.selectedMediaPlayers[0])?.name || this.selectedMediaPlayers[0])
+                    : t_hass.players_selected.replace('{n}', count);
+            const icon = document.createElement('span');
+            icon.textContent = '▼';
+            icon.style.marginLeft = 'auto';
+            icon.style.fontSize = '12px';
+            icon.style.pointerEvents = 'none';
+            btn.appendChild(icon);
+        };
+
         if (this.mediaPlayerEntities.length > 0) {
             this.mediaPlayerEntities.forEach((entity) => {
                 const option = document.createElement('div');
-                option.textContent = entity.name;
                 option.style.padding = '8px';
                 option.style.cursor = 'pointer';
                 option.style.borderBottom = '1px solid var(--divider-color)';
+                option.style.display = 'flex';
+                option.style.alignItems = 'center';
+                option.style.gap = '8px';
+
+                const chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.style.pointerEvents = 'none';
+                chk.checked = this.selectedMediaPlayers.includes(entity.entity_id);
+
+                const lbl = document.createElement('span');
+                lbl.textContent = entity.name;
+
+                option.appendChild(chk);
+                option.appendChild(lbl);
+
                 option.addEventListener('click', () => {
-                    const dropdownButton1 = this.shadowRoot.querySelector('#mass-search-player-btn');
-
-                    // Update selected media player directly
-                    this.selectedMediaPlayer = entity.entity_id;
-                    localStorage.setItem('mass-search-card-player', entity.entity_id);
-
-                    dropdownButton1.textContent = entity.name;
-
-                    // Voeg het icoontje opnieuw toe
-                    const dropdownIcon = document.createElement('span');
-                    dropdownIcon.textContent = '▼';
-                    dropdownIcon.style.marginLeft = 'auto';
-                    dropdownIcon.style.fontSize = '12px';
-                    dropdownIcon.style.pointerEvents = 'none';
-
-                    dropdownButton1.appendChild(dropdownIcon);
-                    dropdownContent1.style.display = 'none';
+                    const idx = this.selectedMediaPlayers.indexOf(entity.entity_id);
+                    if (idx === -1) {
+                        this.selectedMediaPlayers.push(entity.entity_id);
+                    } else {
+                        this.selectedMediaPlayers.splice(idx, 1);
+                    }
+                    localStorage.setItem('mass-search-card-players', JSON.stringify(this.selectedMediaPlayers));
+                    chk.checked = !chk.checked;
+                    // Update button label
+                    const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
+                    if (btn) updatePlayerButtonLabel(btn);
                 });
+
+                option.addEventListener('mouseover', () => { option.style.backgroundColor = 'orange'; });
+                option.addEventListener('mouseout', () => { option.style.backgroundColor = 'transparent'; });
+
                 dropdownContent1.appendChild(option);
             });
         } else {
@@ -1023,25 +1147,14 @@ class MassSearchCard extends HTMLElement {
             dropdownContent1.appendChild(noOption);
         }
 
-        // Pre-selecteer speler op basis van config of localStorage (alleen als nog niet geselecteerd)
-        if (!this.selectedMediaPlayer) {
-            const savedPlayer = this.config?.default_player || localStorage.getItem('mass-search-card-player');
-            if (savedPlayer) {
-                const match = this.mediaPlayerEntities.find(e => e.entity_id === savedPlayer);
-                if (match) {
-                    this.selectedMediaPlayer = match.entity_id;
-                    const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
-                    if (btn) {
-                        btn.textContent = match.name;
-                        const icon = document.createElement('span');
-                        icon.textContent = '▼';
-                        icon.style.marginLeft = 'auto';
-                        icon.style.fontSize = '12px';
-                        icon.style.pointerEvents = 'none';
-                        btn.appendChild(icon);
-                    }
-                }
-            }
+        // Pre-selecteer spelers op basis van config of localStorage (alleen als nog niet geselecteerd)
+        if (!this.selectedMediaPlayers.length) {
+            const saved = this.config?.default_player
+                ? [this.config.default_player]
+                : JSON.parse(localStorage.getItem('mass-search-card-players') || '[]');
+            this.selectedMediaPlayers = saved.filter(id => this.mediaPlayerEntities.some(e => e.entity_id === id));
+            const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
+            if (btn) updatePlayerButtonLabel(btn);
         }
 
         // Controleer of er een shadowRoot is en pas de status door aan child-elementen
