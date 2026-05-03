@@ -32,8 +32,7 @@ class MassSearchCard extends HTMLElement {
           }
         `;
         
-        // Voeg de stijl toe aan de shadowRoot
-        this.shadowRoot.appendChild(style);        
+        // Stijl wordt pas aan shadowRoot toegevoegd na de innerHTML-reset verderop
 
         const translations = {
             nl: {
@@ -228,7 +227,6 @@ class MassSearchCard extends HTMLElement {
                     return_response: true,
                 };
                 if (!mediaPlayer) {
-                    // Toon een waarschuwing als er geen speler is geselecteerd
                     alert(t.dropdown_label_media_player);
                     return;
                 }
@@ -236,11 +234,12 @@ class MassSearchCard extends HTMLElement {
                     alert(t.select_media_type);
                     return;
                 }
+                if (!configEntryId) {
+                    alert('Music Assistant is nog niet geladen. Probeer opnieuw.');
+                    return;
+                }
                 try {
-                    console.log('Sending service message:', message);
                     const response = await this.hass.connection.sendMessagePromise(message);
-                
-                    console.log('Service Response:', response);
                     if (response) {
                         let title; // Dynamische titel gebaseerd op zoekterm
                         // Dynamische titel aanpassing op basis van lengte
@@ -249,7 +248,7 @@ class MassSearchCard extends HTMLElement {
                         } else {
                             title = `${t.popup_title} "${query}" (${mediaType})`;
                         }
-                        this.showPopup(response, title, t);
+                        this.showPopup(response, title, t, mediaType);
                     }
                 } catch (error) {
                     console.error('Error during service call:', error);
@@ -259,10 +258,14 @@ class MassSearchCard extends HTMLElement {
             }
         });
 
+        // Enter-toets triggert zoekopdracht
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') icon_searchbar.click();
+        });
+
         // Samenvoegen
         inputContainer.appendChild(input);
         inputContainer.appendChild(icon_searchbar);
-        document.body.appendChild(inputContainer);
 
         const searchsettingContainer = document.createElement('div');
         searchsettingContainer.style.display = 'flex';
@@ -324,7 +327,6 @@ class MassSearchCard extends HTMLElement {
 
         searchsettingContainer.appendChild(inputlimitresultsContainer);
         searchsettingContainer.appendChild(checkboxContainer);
-        document.body.appendChild(searchsettingContainer);
 
         // Maak een eigen wrapper voor alle elementen
         const wrapper = document.createElement('div');
@@ -537,12 +539,13 @@ class MassSearchCard extends HTMLElement {
 
         // Voeg de wrapper toe aan de shadow DOM
         this.shadowRoot.innerHTML = ''; // Wis bestaande inhoud
+        this.shadowRoot.appendChild(style);  // Stijl opnieuw toevoegen na de reset
         this.shadowRoot.appendChild(wrapper);
         // Toevoegen onder de bestaande methodes in de klasse
 
     }
 
-    showPopup(response, title, t) {
+    showPopup(response, title, t, mediaType) {
         // Maak een popup-container
         const popupContainer = document.createElement('div');
         popupContainer.style.position = 'fixed';
@@ -725,18 +728,13 @@ class MassSearchCard extends HTMLElement {
                 button.appendChild(textContainer);
                 button.appendChild(iconContainer);
             
-                // Handle button click for Track or Album
-                let selectedMediaType = '';
-                let selectedMediaPlayer = this.selectedMediaPlayer;
-            
                 button.addEventListener('click', async () => {
                     try {
                         await this.hass.callService('music_assistant', 'play_media', {
-                            entity_id: selectedMediaPlayer,
-                            media_type: selectedMediaType,
+                            entity_id: this.selectedMediaPlayer,
+                            media_type: mediaType,
                             media_id: mediaItem.uri,
                         });
-                        console.log(`${mediaItem.uri}`);
                     } catch (error) {
                         console.error(`${t.error_fetching}:`, error);
                     }
@@ -761,12 +759,12 @@ class MassSearchCard extends HTMLElement {
         closeButton.style.color = 'var(--card-background-color)';
         closeButton.style.cursor = 'pointer';
         closeButton.addEventListener('click', () => {
-            document.body.removeChild(popupContainer);
+            this.shadowRoot.removeChild(popupContainer);
         });
         popup.appendChild(closeButton);
 
         popupContainer.appendChild(popup);
-        document.body.appendChild(popupContainer);
+        this.shadowRoot.appendChild(popupContainer);
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////
     set hass(hass) {
@@ -796,7 +794,6 @@ class MassSearchCard extends HTMLElement {
             // Zoek de config entry voor 'music_assistant'
             const musicAssistantEntry = entries.find((entry) => entry.domain === 'music_assistant');
             this.configEntryId = musicAssistantEntry ? musicAssistantEntry.entry_id : 'Not found';
-          console.log("Music Assistant Config Entry ID:", this.configEntryId);
         });
 
         dropdownContent1.innerHTML = ''; // Clear previous options
