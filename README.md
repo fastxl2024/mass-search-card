@@ -6,10 +6,14 @@ The **Mass Search Card** is a custom Lovelace card for Home Assistant that lets 
 
 - Search for **artists, tracks, albums, playlists** and **radio stations**
 - Plays directly on any Music Assistant media player
+- **Tracklist view** — click an album or playlist to browse its tracks before playing
 - Filter results by **local library** or **favourites only**
+- Sort results by name or artist
 - Configurable number of search results
+- **Multi-room** — select multiple players simultaneously for synchronised playback
 - **Default player and media type** — remembered automatically, or pinned via config
 - Visual **card editor** in the HA card browser (no YAML required)
+- **Compact mode** — minimal layout without logo and settings
 - **card-mod** compatible
 - Multi-language support: 🇬🇧 English, 🇳🇱 Dutch, 🇨🇿 Czech, 🇸🇪 Swedish, 🇸🇰 Slovak, 🇫🇷 French
 - Responsive layout — works on mobile and desktop
@@ -94,4 +98,4 @@ Currently supported: English (`en`), Dutch (`nl`), Czech (`cz`), Swedish (`sv`),
 
 ## Known issues
 
-- No artwork icon shown when an item is already in the local library
+- No artwork shown for items that are in the local library (fallback image not supported in plain HA resource context)
