@@ -33,6 +33,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Sluiten',
                 dropdown_label_media_player: 'Selecteer een media player',
                 error_fetching: 'Er is een fout opgetreden bij het ophalen van de resultaten.',
+                favorites_only_label: 'Alleen favorieten',
                 library_only_label: 'Lokaal',
                 media_type: 'Soort media',
                 no_results: 'Geen resultaten gevonden.',
@@ -55,6 +56,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Zavřít',
                 dropdown_label_media_player: 'Vyberte přehrávač médií',
                 error_fetching: 'Při načítání výsledků došlo k chybě.',
+                favorites_only_label: 'Pouze oblíbené',
                 library_only_label: 'Pouze knihovna',
                 media_type: 'Typ média',
                 no_results: 'Nebyly nalezeny žádné výsledky.',
@@ -77,6 +79,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Close',
                 dropdown_label_media_player: 'Select a media player',
                 error_fetching: 'An error occurred while fetching results.',
+                favorites_only_label: 'Favourites only',
                 library_only_label: 'Local library',
                 media_type: 'Media type',
                 no_results: 'No results found.',
@@ -99,6 +102,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Stäng',
                 dropdown_label_media_player: 'Välj mediaspelare',
                 error_fetching: 'Ett fel uppstod när resultat hämtades.',
+                favorites_only_label: 'Endast favoriter',
                 library_only_label: 'Endast bibliotek',
                 media_type: 'Mediatyp',
                 no_results: 'Inga resultat funna.',
@@ -121,6 +125,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Zavřít',
                 dropdown_label_media_player: 'Vyberte přehrávač',
                 error_fetching: 'Při načítání výsledků došlo k chybě.',
+                favorites_only_label: 'Pouze oblíbené',
                 library_only_label: 'Lokální knihovna',
                 media_type: 'Typ média',
                 no_results: 'Nebyly nalezeny žádné výsledky.',
@@ -143,6 +148,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Fermer',
                 dropdown_label_media_player: 'Sélectionner un lecteur multimédia',
                 error_fetching: 'Une erreur est survenue lors de la récupération des résultats.',
+                favorites_only_label: 'Favoris uniquement',
                 library_only_label: 'Local',
                 media_type: 'Type de média',
                 no_results: 'Aucun résultat trouvé.',
@@ -165,6 +171,7 @@ class MassSearchCard extends HTMLElement {
                 close_button: 'Zavrieť',
                 dropdown_label_media_player: 'Vyberte prehrávač',
                 error_fetching: 'Pri načítaní výsledkov nastala chyba.',
+                favorites_only_label: 'Len obľúbené',
                 library_only_label: 'Miestna knižnica',
                 media_type: 'Typ média',
                 no_results: 'Nenašli sa žiadne výsledky.',
@@ -225,7 +232,8 @@ class MassSearchCard extends HTMLElement {
                 const mediaPlayer = this.selectedMediaPlayer;
                 const configEntryId = this.configEntryId;
                 const limit = parseInt(inputlimitresults.value, 10) || 8;
-                const libraryOnly = checkbox.checked; // Checkbox voor lokale bibliotheek
+                const libraryOnly = checkbox.checked;
+                const favoritesOnly = favoritesCheckbox.checked;
         
                 const message = {
                     type: 'call_service',
@@ -262,7 +270,7 @@ class MassSearchCard extends HTMLElement {
                         } else {
                             title = `${t.popup_title} "${query}" (${mediaType})`;
                         }
-                        this.showPopup(response, title, t, mediaType);
+                        this.showPopup(response, title, t, mediaType, favoritesOnly);
                     }
                 } catch (error) {
                     console.error('Error during service call:', error);
@@ -340,8 +348,32 @@ class MassSearchCard extends HTMLElement {
         checkboxLabel.style.padding = '8px';
         checkboxContainer.appendChild(checkboxLabel);
 
+        // Favorieten-checkbox container
+        const favoritesContainer = document.createElement('div');
+        favoritesContainer.style.display = 'flex';
+        favoritesContainer.style.alignItems = 'center';
+        favoritesContainer.style.padding = '0px 16px';
+        favoritesContainer.style.flexDirection = 'row';
+        favoritesContainer.style.border = '1px solid var(--primary-color)';
+        favoritesContainer.style.borderRadius = '24px';
+        favoritesContainer.style.backgroundColor = 'var(--card-background-color)';
+        favoritesContainer.style.height = '48.4px';
+
+        const favoritesCheckbox = document.createElement('input');
+        favoritesCheckbox.type = 'checkbox';
+        favoritesCheckbox.style.margin = '0 2px';
+        favoritesContainer.appendChild(favoritesCheckbox);
+
+        const favoritesLabel = document.createElement('label');
+        favoritesLabel.textContent = t.favorites_only_label;
+        favoritesLabel.style.color = 'var(--primary-text-color)';
+        favoritesLabel.style.fontSize = '14px';
+        favoritesLabel.style.padding = '8px';
+        favoritesContainer.appendChild(favoritesLabel);
+
         searchsettingContainer.appendChild(inputlimitresultsContainer);
         searchsettingContainer.appendChild(checkboxContainer);
+        searchsettingContainer.appendChild(favoritesContainer);
 
         // ha-card als wrapper zodat card-mod stijlen kan injecteren
         const wrapper = document.createElement('ha-card');
@@ -559,7 +591,7 @@ class MassSearchCard extends HTMLElement {
 
     }
 
-    showPopup(response, title, t, mediaType) {
+    showPopup(response, title, t, mediaType, favoritesOnly = false) {
         // Maak een popup-container
         const popupContainer = document.createElement('div');
         popupContainer.style.position = 'fixed';
@@ -696,13 +728,17 @@ class MassSearchCard extends HTMLElement {
 
         // Main logic for Tracks and Albums
         if (response?.response?.artists?.length || response?.response?.tracks?.length || response?.response?.albums?.length || response?.response?.radio?.length || response?.response?.playlists?.length) {
-            const mediaItems = [
+            let mediaItems = [
                 ...(response.response.artists || []),
                 ...(response.response.tracks || []),
                 ...(response.response.albums || []),
                 ...(response.response.radio || []),
-                ...(response.response.playlists || []),                
+                ...(response.response.playlists || []),
             ];
+
+            if (favoritesOnly) {
+                mediaItems = mediaItems.filter(item => item.favorite === true);
+            }
         
             mediaItems.forEach(async (mediaItem) => {
                 const button = document.createElement('button');
