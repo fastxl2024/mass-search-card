@@ -570,8 +570,12 @@ class MassSearchCard extends HTMLElement {
         dropdownContent1.classList.add('dropdown-content1');
 
         // Toggle dropdown bij klikken op de knop
-        dropdownButton1.addEventListener('click', () => {
-            dropdownContent1.style.display = dropdownContent1.style.display === 'none' ? 'block' : 'none';
+        dropdownButton1.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownContent1.style.display !== 'none';
+            dropdownContent1.style.display = 'none';
+            dropdownContent2.style.display = 'none';
+            if (!isOpen) dropdownContent1.style.display = 'block';
         });
         
         // Voeg de dropdown-inhoud toe aan de container
@@ -674,8 +678,12 @@ class MassSearchCard extends HTMLElement {
         }
 
         // Klik-event voor de dropdown-knop
-        dropdownButton2.addEventListener('click', () => {
-            dropdownContent2.style.display = dropdownContent2.style.display === 'none' ? 'block' : 'none';
+        dropdownButton2.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownContent2.style.display !== 'none';
+            dropdownContent1.style.display = 'none';
+            dropdownContent2.style.display = 'none';
+            if (!isOpen) dropdownContent2.style.display = 'block';
         });
         
         // Voeg dropdown-elementen toe aan de DOM
@@ -699,8 +707,14 @@ class MassSearchCard extends HTMLElement {
         this.shadowRoot.innerHTML = ''; // Wis bestaande inhoud
         this.shadowRoot.appendChild(style);  // Stijl opnieuw toevoegen na de reset
         this.shadowRoot.appendChild(wrapper);
-        // Toevoegen onder de bestaande methodes in de klasse
 
+        // Sluit dropdowns bij klik buiten de kaart (cleanup oude handler bij herinitialisatie)
+        if (this._closeDropdowns) document.removeEventListener('click', this._closeDropdowns, true);
+        this._closeDropdowns = () => {
+            dropdownContent1.style.display = 'none';
+            dropdownContent2.style.display = 'none';
+        };
+        document.addEventListener('click', this._closeDropdowns, true);
     }
 
     showPopup(response, title, t, mediaType, favoritesOnly = false) {
@@ -931,10 +945,9 @@ class MassSearchCard extends HTMLElement {
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////
     set hass(hass) {
-        // Sla de Home Assistant state op in de klasse
         this._hass = hass;
-        // Filter media_player entities
-        this.mediaPlayerEntities = Object.keys(hass.states)
+
+        const newEntities = Object.keys(hass.states)
             .filter((entityId) => {
                 const entity = hass.states[entityId];
                 return entityId.startsWith('media_player.') && entity.attributes.mass_player_type;
@@ -943,23 +956,26 @@ class MassSearchCard extends HTMLElement {
                 entity_id: entityId,
                 name: hass.states[entityId].attributes.friendly_name || entityId,
             }));
-        //console.log('Filtered media_player entities:', this.mediaPlayerEntities);
 
-        // Select dropdown content
+        // Dropdown alleen herbouwen als spelerslijst veranderd is
+        const newIds = newEntities.map(e => e.entity_id).sort().join(',');
+        const changed = newIds !== (this._lastPlayerIds || '');
+        this._lastPlayerIds = newIds;
+        this.mediaPlayerEntities = newEntities;
+
         const dropdownContent1 = this.shadowRoot.querySelector('.dropdown-content1');
-        if (!dropdownContent1) {
-            console.error('Dropdown content element not found.');
-            return;
+        if (!dropdownContent1) return;
+
+        if (!this.configEntryId) {
+            this._hass.callApi('GET', 'config/config_entries/entry').then((entries) => {
+                const entry = entries.find((e) => e.domain === 'music_assistant');
+                this.configEntryId = entry ? entry.entry_id : 'Not found';
+            });
         }
 
-        // Filter op config_entry_id van de music_assistant integratie  
-        this._hass.callApi('GET', 'config/config_entries/entry').then((entries) => {
-            // Zoek de config entry voor 'music_assistant'
-            const musicAssistantEntry = entries.find((entry) => entry.domain === 'music_assistant');
-            this.configEntryId = musicAssistantEntry ? musicAssistantEntry.entry_id : 'Not found';
-        });
+        if (!changed) return; // Geen wijzigingen — sla DOM-update over
 
-        dropdownContent1.innerHTML = ''; // Clear previous options
+        dropdownContent1.innerHTML = '';
 
         if (this.mediaPlayerEntities.length > 0) {
             this.mediaPlayerEntities.forEach((entity) => {
