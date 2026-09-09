@@ -1387,15 +1387,27 @@ class MassSearchCard extends HTMLElement {
         this._lastPlayerIds = newIds;
         this.mediaPlayerEntities = newEntities;
 
-        const dropdownContent1 = this.shadowRoot.querySelector('.dropdown-content1');
-        if (!dropdownContent1) return;
-
+        // BUGFIX 1: ConfigEntryId (Music Assistant) laden, BEVOR wegen fehlendem Dropdown abgebrochen wird
         if (!this.configEntryId) {
             this._hass.callApi('GET', 'config/config_entries/entry').then((entries) => {
                 const entry = entries.find((e) => e.domain === 'music_assistant');
                 this.configEntryId = entry ? entry.entry_id : 'Not found';
             });
         }
+
+        // BUGFIX 2: Standard-Player laden, BEVOR wegen fehlendem Dropdown abgebrochen wird
+        if (!this.selectedMediaPlayers.length) {
+            const saved = this.config?.default_player
+                ? [this.config.default_player]
+                : JSON.parse(localStorage.getItem('mass-search-card-players') || '[]');
+            this.selectedMediaPlayers = saved.filter(id => this.mediaPlayerEntities.some(e => e.entity_id === id));
+        }
+
+        const dropdownContent1 = this.shadowRoot.querySelector('.dropdown-content1');
+        
+        // Wenn das Dropdown nicht existiert (Compact Mode / Versteckt), brich hier ab. 
+        // Die wichtigen Daten wurden durch den Bugfix oben nun trotzdem geladen!
+        if (!dropdownContent1) return; 
 
         if (!changed) return; // Geen wijzigingen — sla DOM-update over
 
@@ -1477,15 +1489,9 @@ class MassSearchCard extends HTMLElement {
             dropdownContent1.appendChild(noOption);
         }
 
-        // Pre-selecteer spelers op basis van config of localStorage (alleen als nog niet geselecteerd)
-        if (!this.selectedMediaPlayers.length) {
-            const saved = this.config?.default_player
-                ? [this.config.default_player]
-                : JSON.parse(localStorage.getItem('mass-search-card-players') || '[]');
-            this.selectedMediaPlayers = saved.filter(id => this.mediaPlayerEntities.some(e => e.entity_id === id));
-            const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
-            if (btn) updatePlayerButtonLabel(btn);
-        }
+        // Update den Label-Button, falls das Element existiert
+        const btn = this.shadowRoot.querySelector('#mass-search-player-btn');
+        if (btn) updatePlayerButtonLabel(btn);
 
         // Sync checkboxes met huidige selectie (alleen bij multiroom)
         if (this.config?.multiroom) {
@@ -1494,7 +1500,6 @@ class MassSearchCard extends HTMLElement {
                 if (chk) chk.checked = this.selectedMediaPlayers.includes(opt.dataset.entityId);
             });
         }
-
     }
     get hass() {
         return this._hass;
